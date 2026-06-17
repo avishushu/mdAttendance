@@ -43,12 +43,12 @@
             --ink-3:        #374151;
             --muted:        #6b7280;
             --subtle:       #9ca3af;
-            --bg:           #f2f4f8;
+            --bg:           #eef0f6;
             --surface:      #ffffff;
-            --surface-2:    #f8f9fb;
-            --surface-3:    #f0f2f6;
-            --border:       #e2e6ed;
-            --border-light: #edf0f5;
+            --surface-2:    #f5f7fb;
+            --surface-3:    #edf0f6;
+            --border:       #dde2ea;
+            --border-light: #e8ecf2;
             --green:        #059669;
             --green-soft:   rgba(5, 150, 105, 0.10);
             --amber:        #d97706;
@@ -1414,7 +1414,7 @@
         /* Tab slide transition */
         .tab-panel-wrap {
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden; /* hide horizontal slide-animation overflow only — NOT overflow:hidden which blocks vertical scroll on tall tab content */
         }
         .tab-panel {
             transition: opacity 0.28s var(--ease-out), transform 0.28s var(--ease-out);
@@ -1432,20 +1432,20 @@
             animation: tabExitToRight 0.22s var(--ease-out) both;
         }
         @keyframes tabSlideFromLeft {
-            from { opacity: 0; transform: translateX(-32px); }
+            from { opacity: 0; transform: translateX(-18px); }
             to   { opacity: 1; transform: translateX(0); }
         }
         @keyframes tabSlideFromRight {
-            from { opacity: 0; transform: translateX(32px); }
+            from { opacity: 0; transform: translateX(18px); }
             to   { opacity: 1; transform: translateX(0); }
         }
         @keyframes tabExitToLeft {
             from { opacity: 1; transform: translateX(0); }
-            to   { opacity: 0; transform: translateX(-32px); }
+            to   { opacity: 0; transform: translateX(-18px); }
         }
         @keyframes tabExitToRight {
             from { opacity: 1; transform: translateX(0); }
-            to   { opacity: 0; transform: translateX(32px); }
+            to   { opacity: 0; transform: translateX(18px); }
         }
 
         /* Card stagger entrance */
@@ -1544,8 +1544,9 @@
         html { overscroll-behavior-y: auto; }
         body {
             background: var(--bg);
-            background-image: radial-gradient(ellipse 70% 50% at 90% 0%, rgba(220,38,38,0.05) 0%, transparent 70%),
-                              radial-gradient(ellipse 50% 40% at 10% 100%, rgba(13,17,23,0.04) 0%, transparent 70%);
+            background-image:
+                radial-gradient(ellipse 80% 50% at 90% -5%, rgba(220,38,38,0.08) 0%, transparent 65%),
+                radial-gradient(ellipse 55% 40% at 10% 110%, rgba(220,38,38,0.04) 0%, transparent 65%);
             color: var(--ink); min-height: 100vh;
             display: flex; flex-direction: column; padding-top: 64px; padding-bottom: 72px;
         }
@@ -1620,10 +1621,19 @@
         main { flex: 1; padding: 20px 14px 32px; max-width: 820px; margin: 0 auto; width: 100%; }
         /* CARDS */
         .card {
-            background: var(--surface); border-radius: var(--r-xl);
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border-radius: var(--r-xl);
             padding: 26px 24px; box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border); margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.85); margin-bottom: 16px;
             transition: transform 0.25s var(--ease-bounce), box-shadow 0.25s var(--ease-out);
+        }
+        html[data-theme="dark"] .card {
+            background: var(--surface);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-color: var(--border);
         }
         .clickable { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         .clickable:hover  { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #d4d9e3; }
@@ -2304,7 +2314,117 @@
         .pass-toggle-btn:hover { color: var(--ink); background: var(--surface-2) !important; }
         .pass-toggle-btn:active { transform: translateY(-50%) scale(0.9) !important; }
 
-        /* ── STUDENT GREETING BANNER ─────────────────────────────────── */
+        /* ══════════════════════════════════════════════════════════════
+           DEPTH SYSTEM v3 — SAFE, CONSISTENT, NON-CONFLICTING
+           Philosophy:
+           • No overflow:hidden on page cards (protects dropdowns).
+           • No ::before gradient wash (glass card already provides depth).
+           • One thin accent top-border per screen — the only colour signal.
+           • Card glass surface via background only (no overflow changes).
+           • All colours taken directly from the app's existing palette.
+           • Dark mode: border accent only, no glass (keeps dark clean).
+        ══════════════════════════════════════════════════════════════ */
+
+        /* ── Light mode: card glass surface ──────────────────────── */
+        html:not([data-theme="dark"]) .card {
+            background: rgba(255,255,255,0.84);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            box-shadow: 0 2px 10px rgba(13,17,23,0.07), 0 1px 3px rgba(13,17,23,0.04);
+        }
+        html:not([data-theme="dark"]) .card:hover {
+            box-shadow: 0 6px 22px rgba(13,17,23,0.09), 0 2px 6px rgba(13,17,23,0.05);
+        }
+
+        /* ── Dark mode: solid surface, deeper shadow ─────────────── */
+        html[data-theme="dark"] .card {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.22);
+        }
+        html[data-theme="dark"] .card:hover {
+            box-shadow: 0 6px 22px rgba(0,0,0,0.46), 0 2px 6px rgba(0,0,0,0.28);
+        }
+
+        /* ── Accent gradient wash per screen ─────────────────────────
+           Applied directly as background-image on the card so it always
+           stays inside the border-radius. No pseudo-element, no clipping.
+           Layered over the base rgba(255,255,255,0.84) background.
+        ────────────────────────────────────────────────────────────── */
+
+        /* Light mode — red wash */
+        html:not([data-theme="dark"]) #instructor-main > .card:first-child,
+        html:not([data-theme="dark"]) #instructor-group-details > .card:first-child,
+        html:not([data-theme="dark"]) #session-report-view > .card:first-child,
+        html:not([data-theme="dark"]) #student-main-dashboard > .card:first-child,
+        html:not([data-theme="dark"]) #student-group-details > .card:first-child,
+        html:not([data-theme="dark"]) #student-session-status-view > .card:first-child,
+        html:not([data-theme="dark"]) #view-admin {
+            background-image: linear-gradient(180deg, rgba(220,38,38,0.07) 0%, rgba(220,38,38,0) 90px);
+        }
+        html:not([data-theme="dark"]) #view-frozen > .card:first-child {
+            background-image: linear-gradient(180deg, rgba(100,116,139,0.07) 0%, rgba(100,116,139,0) 90px);
+        }
+
+        /* Dark mode — same wash, dimmed */
+        html[data-theme="dark"] #instructor-main > .card:first-child,
+        html[data-theme="dark"] #instructor-group-details > .card:first-child,
+        html[data-theme="dark"] #session-report-view > .card:first-child,
+        html[data-theme="dark"] #student-main-dashboard > .card:first-child,
+        html[data-theme="dark"] #student-group-details > .card:first-child,
+        html[data-theme="dark"] #student-session-status-view > .card:first-child,
+        html[data-theme="dark"] #view-admin {
+            background-image: linear-gradient(180deg, rgba(248,113,113,0.07) 0%, rgba(248,113,113,0) 90px);
+        }
+        html[data-theme="dark"] #view-frozen > .card:first-child {
+            background-image: linear-gradient(180deg, rgba(148,163,184,0.07) 0%, rgba(148,163,184,0) 90px);
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           MODAL & BOTTOM SHEET SURFACE POLISH
+           Light: glass (same treatment as page cards).
+           Dark:  solid var(--surface), no glass.
+        ══════════════════════════════════════════════════════════════ */
+
+        /* ── Bottom sheets — light mode glass ── */
+        html:not([data-theme="dark"]) .modal-overlay > .card,
+        html:not([data-theme="dark"]) #profile-modal-box,
+        html:not([data-theme="dark"]) #app-dialog-box,
+        html:not([data-theme="dark"]) #attend-note-box {
+            background: rgba(255,255,255,0.90);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+        }
+
+        /* ── Center modals — light mode glass ── */
+        html:not([data-theme="dark"]) .modal-center > .card,
+        html:not([data-theme="dark"]) #exc-result-box,
+        html:not([data-theme="dark"]) #attend-success-box {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(32px) saturate(190%);
+            -webkit-backdrop-filter: blur(32px) saturate(190%);
+        }
+        /* Fallback for browsers without backdrop-filter */
+        #exc-result-box,
+        #attend-success-box { background: var(--surface); }
+
+        /* ── Dark mode — bottom sheets ── */
+        html[data-theme="dark"] .modal-overlay > .card {
+            background: var(--surface);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            box-shadow: 0 -8px 48px rgba(0,0,0,0.55);
+        }
+        html[data-theme="dark"] #attend-note-box {
+            background: var(--surface);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            box-shadow: 0 -8px 48px rgba(0,0,0,0.55);
+        }
+
+        /* ── Dark mode — center modals ── */
+        html[data-theme="dark"] #exc-result-box,
+        html[data-theme="dark"] #attend-success-box {
+            background: var(--surface);
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+        }
+
         #student-greeting-banner {
             background: linear-gradient(135deg, var(--red) 0%, #b91c1c 100%);
             border-radius: var(--r-xl);
@@ -2366,6 +2486,19 @@
             border-color: #f87171;
             box-shadow: 0 4px 20px rgba(248,113,113,0.18), var(--shadow-sm);
         }
+        /* ── Registered / Active state — green card ─────────────────── */
+        .student-session-alert.ssa-registered {
+            border-color: #059669;
+            box-shadow: 0 4px 20px rgba(5,150,105,0.15), var(--shadow-sm);
+            animation: none;
+            cursor: pointer;
+        }
+        .student-session-alert.ssa-registered:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(5,150,105,0.22), var(--shadow-sm); }
+        .student-session-alert.ssa-registered:active { transform: scale(0.985); }
+        html[data-theme="dark"] .student-session-alert.ssa-registered {
+            border-color: #34d399;
+            box-shadow: 0 4px 20px rgba(52,211,153,0.15), var(--shadow-sm);
+        }
         .ssa-header {
             background: linear-gradient(135deg, var(--red) 0%, #b91c1c 100%);
             padding: 12px 18px;
@@ -2374,7 +2507,30 @@
             gap: 10px;
             color: white;
         }
+        /* Green header for registered state */
+        .ssa-header.ssa-header-green {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+        html[data-theme="dark"] .ssa-header.ssa-header-green { background: linear-gradient(135deg, #065f46 0%, #047857 100%); }
         html[data-theme="dark"] .ssa-header { background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%); }
+        /* Registered pill strip */
+        .ssa-registered-strip {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, rgba(5,150,105,0.1), rgba(16,185,129,0.07));
+            border-top: 1px solid rgba(5,150,105,0.2);
+            padding: 10px 18px;
+            font-size: 0.82rem; font-weight: 700; color: #059669;
+        }
+        html[data-theme="dark"] .ssa-registered-strip { color: #34d399; background: rgba(5,150,105,0.12); border-color: rgba(52,211,153,0.2); }
+        .ssa-reg-detail-chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.22);
+            border-radius: 99px; padding: 3px 10px;
+            font-size: 0.77rem; font-weight: 700; color: #059669;
+        }
+        html[data-theme="dark"] .ssa-reg-detail-chip { color: #34d399; background: rgba(5,150,105,0.15); border-color: rgba(52,211,153,0.25); }
+        .ssa-reg-detail-chip.late { color: #d97706; background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.22); }
+        html[data-theme="dark"] .ssa-reg-detail-chip.late { color: #fbbf24; }
         .ssa-header-icon {
             width: 36px; height: 36px; flex-shrink: 0;
             background: rgba(255,255,255,0.2);
@@ -2558,6 +2714,7 @@
         }
         #tab-session-bud.visible { display: inline-flex; }
         #tab-session-bud.pulse-ring { animation: tabBudPop 0.35s var(--ease-bounce) both, tabBudRing 1.4s ease-in-out 0.4s infinite; }
+        #tab-session-bud.registered { background: linear-gradient(135deg,#059669,#047857); animation: tabBudPop 0.35s var(--ease-bounce) both; }
         @keyframes tabBudPop {
             from { opacity:0; transform:scale(0.6) translateY(-6px); }
             to   { opacity:1; transform:scale(1) translateY(0); }
@@ -2757,9 +2914,7 @@
 
         /* HIDDEN */
         .hidden { display: none !important; }
-        section { animation: fadeInUp 0.28s var(--ease-out) both; }
-        .card   { animation: fadeInUp 0.28s var(--ease-out) both; }
-        /* מודאלים מקבלים animation משלהם — מבטלים fadeInUp כדי שה-JS יוכל לשלוט ב-transform */
+        /* sections and cards no longer auto-animate — view transition system handles all entrance/exit */
         .modal-overlay > .card,
         .modal-center  > .card { animation: none !important; will-change: transform; }
         #report-container .list-item { animation: none !important; }
@@ -2767,26 +2922,55 @@
         /* ══════════════════════════════════════════════════════
            VIEW TRANSITIONS — אנימציות מעבר בין מסכים
         ══════════════════════════════════════════════════════ */
+        /* ── VIEW TRANSITIONS — iOS-style coordinated enter/exit ──────
+           Philosophy:
+           • Small translation (16px) — suggests movement, not teleporting
+           • Fast: 260ms enter, 180ms exit — feels snappy on mobile
+           • Spring easing on enter, sharp ease-in on exit
+           • Exit class added by JS before hide, auto-removed after
+        ──────────────────────────────────────────────────────────── */
         @keyframes viewFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0);    }
+            from { opacity: 0; transform: translateY(10px) scale(0.99); }
+            to   { opacity: 1; transform: translateY(0)    scale(1);    }
+        }
+        @keyframes viewFadeOut {
+            from { opacity: 1; transform: translateY(0)    scale(1);    }
+            to   { opacity: 0; transform: translateY(-8px) scale(0.99); }
         }
         @keyframes viewSlideInRight {
-            from { opacity: 0; transform: translateX(28px); }
+            from { opacity: 0; transform: translateX(16px); }
             to   { opacity: 1; transform: translateX(0);    }
         }
+        @keyframes viewSlideOutLeft {
+            from { opacity: 1; transform: translateX(0);     }
+            to   { opacity: 0; transform: translateX(-16px); }
+        }
         @keyframes viewSlideInLeft {
-            from { opacity: 0; transform: translateX(-28px); }
+            from { opacity: 0; transform: translateX(-16px); }
             to   { opacity: 1; transform: translateX(0);     }
         }
+        @keyframes viewSlideOutRight {
+            from { opacity: 1; transform: translateX(0);    }
+            to   { opacity: 0; transform: translateX(16px); }
+        }
         @keyframes viewSlideUp {
-            from { opacity: 0; transform: translateY(32px); }
+            from { opacity: 0; transform: translateY(22px); }
             to   { opacity: 1; transform: translateY(0);    }
         }
-        .view-entering         { animation: viewFadeIn       0.30s var(--ease-out) both; }
-        .view-entering-forward { animation: viewSlideInRight  0.28s var(--ease-out) both; }
-        .view-entering-back    { animation: viewSlideInLeft   0.28s var(--ease-out) both; }
-        .view-entering-up      { animation: viewSlideUp       0.32s var(--ease-out) both; }
+        @keyframes viewSlideDown {
+            from { opacity: 1; transform: translateY(0);     }
+            to   { opacity: 0; transform: translateY(22px);  }
+        }
+        /* Enter classes */
+        .view-entering         { animation: viewFadeIn      0.26s cubic-bezier(0.22,1,0.36,1) both; }
+        .view-entering-forward { animation: viewSlideInRight 0.26s cubic-bezier(0.22,1,0.36,1) both; }
+        .view-entering-back    { animation: viewSlideInLeft  0.26s cubic-bezier(0.22,1,0.36,1) both; }
+        .view-entering-up      { animation: viewSlideUp      0.28s cubic-bezier(0.22,1,0.36,1) both; }
+        /* Exit classes — added by JS, auto-removed on animationend */
+        .view-exiting          { animation: viewFadeOut      0.18s cubic-bezier(0.4,0,1,1) both; pointer-events: none; }
+        .view-exiting-forward  { animation: viewSlideOutLeft  0.18s cubic-bezier(0.4,0,1,1) both; pointer-events: none; }
+        .view-exiting-back     { animation: viewSlideOutRight 0.18s cubic-bezier(0.4,0,1,1) both; pointer-events: none; }
+        .view-exiting-down     { animation: viewSlideDown     0.18s cubic-bezier(0.4,0,1,1) both; pointer-events: none; }
         /* Multi-round attendance - legacy dots kept for non-multiround contexts */
         .round-progress { display:flex; gap:4px; align-items:center; margin-top:4px; }
         .round-dot {
@@ -2999,6 +3183,7 @@
             display: flex; flex-direction: column; align-items: center; gap: 10px;
             text-align: center;
             position: relative;
+            transition: background 0.3s ease;
         }
         html[data-theme="dark"] .lrm-header {
             background: linear-gradient(135deg, #450a0a 0%, #991b1b 60%, #dc2626 100%);
@@ -3033,6 +3218,7 @@
             display: flex; align-items: flex-start; gap: 10px;
             font-size: 0.88rem; color: var(--ink); line-height: 1.4;
         }
+        .lrm-tip-row strong { font-weight: 700; }
         .lrm-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
         .lrm-actions { display: flex; flex-direction: column; gap: 8px; }
         .lrm-btn-retry {
@@ -4422,7 +4608,7 @@
 
     <!-- Student exception-result modal (shown to student after instructor decision) -->
     <div id="exc-result-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);">
-        <div id="exc-result-box" style="background:var(--surface);border-radius:24px;padding:36px 28px;text-align:center;max-width:320px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,0.25);transform:scale(0.7);opacity:0;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.28s ease;position:relative;overflow:hidden;">
+        <div id="exc-result-box" style="border-radius:24px;padding:36px 28px;text-align:center;max-width:320px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,0.25);transform:scale(0.7);opacity:0;transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1),opacity 0.28s ease;position:relative;overflow:hidden;">
             <div id="exc-result-icon"  style="font-size:2.6rem;margin-bottom:10px;">✅</div>
             <div id="exc-result-title" style="font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:900;color:var(--ink);margin-bottom:8px;"></div>
             <div id="exc-result-msg"   style="font-size:0.97rem;color:var(--muted);line-height:1.55;"></div>
@@ -4460,27 +4646,23 @@
             <!-- Drag handle -->
             <div style="width:36px;height:4px;background:rgba(255,255,255,0.4);border-radius:99px;margin:12px auto 0;"></div>
 
-            <!-- Coloured header — no distance shown (anti-cheat) -->
-            <div class="lrm-header">
-                <div class="lrm-header-icon">📍</div>
-                <h3 class="lrm-header-title">לא זוהית במיקום המפגש</h3>
-                <p class="lrm-header-sub">המערכת לא הצליחה לאמת את מיקומך. ודא שאתה נמצא בסביבת המפגש ונסה שוב.</p>
+            <!-- Header — icon/title/sub updated dynamically by _showLocationError() -->
+            <div class="lrm-header" id="lrm-header">
+                <div class="lrm-header-icon" id="lrm-icon">📍</div>
+                <h3 class="lrm-header-title" id="lrm-title">לא זוהית במיקום המפגש</h3>
+                <p class="lrm-header-sub" id="lrm-sub">המערכת לא הצליחה לאמת את מיקומך.</p>
             </div>
 
             <div class="lrm-body">
-                <!-- Tips accordion -->
-                <div class="lrm-tips">
+                <!-- Tips — rebuilt dynamically -->
+                <div class="lrm-tips" id="lrm-tips">
                     <div class="lrm-tips-title">💡 מה לעשות</div>
                     <div class="lrm-tip-row"><span class="lrm-tip-icon">📶</span><span>ודא שה-GPS דולק ומדויק</span></div>
-                    <div class="lrm-tip-row"><span class="lrm-tip-icon">🏃</span><span>התקרב למיקום בו נמצא המדריך</span></div>
-                    <div class="lrm-tip-row"><span class="lrm-tip-icon">🔋</span><span>כבה מצב חיסכון בסוללה</span></div>
-                    <div class="lrm-tip-row"><span class="lrm-tip-icon">🌐</span><span>היכנס לאזור עם קליטה טובה יותר</span></div>
                 </div>
 
                 <!-- Actions -->
                 <div class="lrm-actions">
                     <button id="btn-retry-location" class="lrm-btn-retry">🔄 נסה שוב</button>
-                    <!-- Exception button — revealed by _showExceptionBtn() after first failure -->
                     <button id="btn-send-exception" style="max-height:0;overflow:hidden;opacity:0;padding-top:0;padding-bottom:0;border-width:0;pointer-events:none;transition:max-height 0.35s ease,opacity 0.3s ease,padding 0.3s ease,border-width 0.3s ease;">
                         ✋ שלח בקשה חריגה למדריך
                     </button>
@@ -5484,7 +5666,9 @@
 
             function isAnyModalOpen() {
                 return MODAL_SELECTORS.some(sel =>
-                    [...document.querySelectorAll(sel)].some(el => !el.classList.contains('hidden'))
+                    [...document.querySelectorAll(sel)].some(el =>
+                        !el.classList.contains('hidden') && !el.dataset.noScrollLock
+                    )
                 );
             }
 
@@ -5496,6 +5680,7 @@
                 else if (!open && wasOpen) { unlockBody(); wasOpen = false; }
             });
 
+            // Observe existing modals (static DOM)
             setTimeout(() => {
                 MODAL_SELECTORS.forEach(sel => {
                     document.querySelectorAll(sel).forEach(el => {
@@ -5503,6 +5688,36 @@
                     });
                 });
             }, 50);
+
+            // FIX: Also observe dynamically-added modal-overlay elements (e.g. practice-group-picker)
+            // so that scroll lock fires correctly when they are added/removed/hidden after page load.
+            const bodyChildObserver = new MutationObserver((mutations) => {
+                mutations.forEach(mut => {
+                    mut.addedNodes.forEach(node => {
+                        if (node.nodeType !== 1) return;
+                        // Observe the node itself if it matches a modal selector
+                        const isModal = MODAL_SELECTORS.some(sel => node.matches && node.matches(sel));
+                        if (isModal) {
+                            observer.observe(node, { attributes: true, attributeFilter: ['class'] });
+                        }
+                        // Also scan descendants (e.g. nested overlays)
+                        MODAL_SELECTORS.forEach(sel => {
+                            node.querySelectorAll && node.querySelectorAll(sel).forEach(el => {
+                                observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+                            });
+                        });
+                        // Trigger a check immediately in case the node is already visible
+                        const open = isAnyModalOpen();
+                        if (open && !wasOpen) { lockBody(); wasOpen = true; }
+                    });
+                    // When a node is removed from DOM, re-check lock state
+                    if (mut.removedNodes.length > 0) {
+                        const open = isAnyModalOpen();
+                        if (!open && wasOpen) { unlockBody(); wasOpen = false; }
+                    }
+                });
+            });
+            bodyChildObserver.observe(document.body, { childList: true, subtree: false });
         })();
 
         // =====================================================
@@ -5772,13 +5987,28 @@
         // ── Helper: trigger a CSS-only entrance animation on an element
         function _animateEnter(el, cls) {
             if (!el) return;
-            el.classList.remove('view-entering', 'view-entering-forward', 'view-entering-back', 'view-entering-up');
-            // Force reflow so removing+adding the class is detected
+            el.classList.remove(
+                'view-entering', 'view-entering-forward', 'view-entering-back', 'view-entering-up',
+                'view-exiting',  'view-exiting-forward',  'view-exiting-back',  'view-exiting-down'
+            );
+            void el.offsetWidth; // force reflow
+            el.classList.add(cls);
+            el.addEventListener('animationend', () => el.classList.remove(cls), { once: true });
+        }
+
+        // Exit animation — plays on the outgoing element, then hides it
+        function _animateExit(el, cls, onDone) {
+            if (!el || el.classList.contains('hidden')) { onDone && onDone(); return; }
+            el.classList.remove(
+                'view-entering', 'view-entering-forward', 'view-entering-back', 'view-entering-up',
+                'view-exiting',  'view-exiting-forward',  'view-exiting-back',  'view-exiting-down'
+            );
             void el.offsetWidth;
             el.classList.add(cls);
-            // Clean up after animation completes (keeps DOM tidy)
-            const cleanup = () => el.classList.remove(cls);
-            el.addEventListener('animationend', cleanup, { once: true });
+            el.addEventListener('animationend', () => {
+                el.classList.remove(cls);
+                onDone && onDone();
+            }, { once: true });
         }
 
         // =====================================================
@@ -5912,14 +6142,15 @@
                     _navStack.pop();
                     const prev2 = _navStack[_navStack.length - 1];
                     if (prev2 && prev2.type === 'group') {
-                        document.getElementById('session-report-view').classList.add('hidden');
+                        const _srp = document.getElementById('session-report-view');
                         if (state.liveUnsubscribe) { state.liveUnsubscribe(); state.liveUnsubscribe = null; }
                         state.curSessionId = null;
                         const igd = document.getElementById('instructor-group-details');
+                        _animateExit(_srp, 'view-exiting-back', () => _srp.classList.add('hidden'));
                         igd.classList.remove('hidden');
                         _animateEnter(igd, 'view-entering-back');
                     } else {
-                        _navSuppressNext = false; // backFromGroupDetails uses _showViewInternal, no suppress needed
+                        _navSuppressNext = false;
                         backFromGroupDetails();
                     }
                     return;
@@ -5928,14 +6159,15 @@
                 if (prev.type === 'group') {
                     const srpVisible = !document.getElementById('session-report-view').classList.contains('hidden');
                     if (srpVisible) {
-                        document.getElementById('session-report-view').classList.add('hidden');
+                        const _srp2 = document.getElementById('session-report-view');
                         if (state.liveUnsubscribe) { state.liveUnsubscribe(); state.liveUnsubscribe = null; }
                         state.curSessionId = null;
                         const igd = document.getElementById('instructor-group-details');
+                        _animateExit(_srp2, 'view-exiting-back', () => _srp2.classList.add('hidden'));
                         igd.classList.remove('hidden');
                         _animateEnter(igd, 'view-entering-back');
                     } else {
-                        _navSuppressNext = false; // backFromGroupDetails uses _showViewInternal, no suppress needed
+                        _navSuppressNext = false;
                         backFromGroupDetails();
                     }
                     return;
@@ -5943,18 +6175,19 @@
 
                 if (prev.type === 'sessionStatus') {
                     const ssv = document.getElementById('student-session-status-view');
-                    if (ssv) ssv.classList.add('hidden');
                     if (window._ssvTimer) { clearInterval(window._ssvTimer); window._ssvTimer = null; }
                     if (window._ssvLiveUnsub) { window._ssvLiveUnsub(); window._ssvLiveUnsub = null; }
                     const dash = document.getElementById('student-main-dashboard');
+                    _animateExit(ssv, 'view-exiting-back', () => ssv && ssv.classList.add('hidden'));
                     dash.classList.remove('hidden');
                     _animateEnter(dash, 'view-entering-back');
                     return;
                 }
 
                 if (prev.type === 'studentGroup') {
-                    document.getElementById('student-group-details').classList.add('hidden');
+                    const sgd = document.getElementById('student-group-details');
                     const dash = document.getElementById('student-main-dashboard');
+                    _animateExit(sgd, 'view-exiting-back', () => sgd.classList.add('hidden'));
                     dash.classList.remove('hidden');
                     _animateEnter(dash, 'view-entering-back');
                     return;
@@ -5972,31 +6205,62 @@
 
         // Internal showView that does NOT push history (used by popstate handler and internal navigation)
         function _showViewInternal(id) {
-            // When leaving student view — stop live session listeners to save reads
-            if (id !== 'view-student') {
-                _stopStudentLiveListeners();
-                // _studentLiveDebounceTimer removed — live listeners no longer use debounce
+            if (id !== 'view-student') _stopStudentLiveListeners();
+            if (id !== 'session-report-view') _stopDurationBar();
+            if (window._ssvTimer) { clearInterval(window._ssvTimer); window._ssvTimer = null; }
+            if (window._ssvLiveUnsub) { window._ssvLiveUnsub(); window._ssvLiveUnsub = null; }
+
+            // Find the currently visible view to exit — prefer sub-views over wrapper sections
+            const _subViewIds = [
+                'instructor-main','instructor-group-details','session-report-view',
+                'student-main-dashboard','student-group-details',
+                'student-session-status-view','student-quiz-view'
+            ];
+            const _topViewIds = ['view-frozen','view-admin','view-auth'];
+            const _exitEl =
+                [..._subViewIds, ..._topViewIds]
+                    .map(v => document.getElementById(v))
+                    .find(el => el && !el.classList.contains('hidden') && el.id !== id);
+
+            const _doShow = () => {
+                document.querySelectorAll('section, #instructor-main, #instructor-group-details, #session-report-view, #student-main-dashboard, #student-group-details, #student-quiz-view, #student-session-status-view, #view-frozen')
+                    .forEach(e => e.classList.add('hidden'));
+                const target = document.getElementById(id);
+                if (!target) return;
+                target.classList.remove('hidden');
+                // For wrapper sections (view-instructor, view-student), don't animate the wrapper —
+                // animate the inner sub-view instead. For standalone sections, animate directly.
+                if (id === 'view-instructor') {
+                    const main = document.getElementById('instructor-main');
+                    main.classList.remove('hidden');
+                    _animateEnter(main, 'view-entering');
+                } else if (id === 'view-student') {
+                    const dash = document.getElementById('student-main-dashboard');
+                    dash.classList.remove('hidden');
+                    _animateEnter(dash, 'view-entering');
+                } else {
+                    _animateEnter(target, 'view-entering');
+                }
+                updateBottomNavActive(id);
+            };
+
+            if (_exitEl) {
+                _exitEl.classList.remove(
+                    'view-entering','view-entering-forward','view-entering-back','view-entering-up',
+                    'view-exiting','view-exiting-forward','view-exiting-back','view-exiting-down'
+                );
+                void _exitEl.offsetWidth;
+                _exitEl.classList.add('view-exiting');
+                // Show new view after exit completes — with 200ms fallback in case animationend misfires
+                const _exitTimer = setTimeout(_doShow, 200);
+                _exitEl.addEventListener('animationend', () => {
+                    clearTimeout(_exitTimer);
+                    _exitEl.classList.remove('view-exiting');
+                    _doShow();
+                }, { once: true });
+            } else {
+                _doShow();
             }
-            // When leaving session report — stop duration bar timer
-            if (id !== 'session-report-view') {
-                _stopDurationBar();
-            }
-            document.querySelectorAll('section, #instructor-main, #instructor-group-details, #session-report-view, #student-main-dashboard, #student-group-details, #student-quiz-view, #student-session-status-view, #view-frozen').forEach(e => e.classList.add('hidden')); if (window._ssvTimer) { clearInterval(window._ssvTimer); window._ssvTimer = null; } if (window._ssvLiveUnsub) { window._ssvLiveUnsub(); window._ssvLiveUnsub = null; }
-            const target = document.getElementById(id);
-            if (!target) return;
-            target.classList.remove('hidden');
-            _animateEnter(target, 'view-entering');
-            if (id === 'view-instructor') {
-                const main = document.getElementById('instructor-main');
-                main.classList.remove('hidden');
-                _animateEnter(main, 'view-entering');
-            }
-            if (id === 'view-student') {
-                const dash = document.getElementById('student-main-dashboard');
-                dash.classList.remove('hidden');
-                _animateEnter(dash, 'view-entering');
-            }
-            updateBottomNavActive(id);
         }
 
         function _navReset() {
@@ -6061,7 +6325,10 @@
                 if (role !== 'instructor' && role !== 'admin') return;
 
                 const now = new Date();
-                const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+                // Use local date (not UTC) so Israel UTC+3 sessions don't get missed before 3am
+                const todayStr = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0');
 
                 // Load all groups this instructor manages
                 let groupDocs = [];
@@ -6096,9 +6363,11 @@
                         sessionStart.setHours(sh, sm, 0, 0);
 
                         const minsUntil = (sessionStart - now) / 60000;
-                        // Open window: honour per-session openMinutesBefore (default 5), plus 2-min past buffer
+                        // Open window: honour per-session openMinutesBefore (default 5).
+                        // Past-buffer extended to 10 minutes so a 60-second watcher cycle that
+                        // runs slightly late doesn't permanently miss a session start.
                         const earlyMins = (s.openMinutesBefore != null) ? s.openMinutesBefore : 5;
-                        if (minsUntil > earlyMins || minsUntil < -2) continue;
+                        if (minsUntil > earlyMins || minsUntil < -10) continue;
 
                         // Guard: don't try to open the same session twice
                         const guardKey = `_autoOpened_${sd.id}`;
@@ -6400,27 +6669,59 @@
         document.getElementById('bn-practice').addEventListener('click', async () => {
             const gid = state._curStudentGroupId;
             const name = state._curStudentGroupName || '';
+            // Helper: is view-student already the active view?
+            const onStudentView = () => !document.getElementById('view-student').classList.contains('hidden');
             if (gid) {
-                // Already in a group — open practice tab directly
+                // Already in a group — open practice tab directly.
+                // IMPORTANT: do NOT call showView('view-student') if already on it.
+                // showView triggers _showViewInternal which finds student-group-details as the
+                // _exitEl, animates it out, and ~200ms later _doShow hides it and shows the
+                // dashboard — causing a race condition with openStudentGroup (screen appears
+                // briefly then disappears, or never opens at all).
                 closeModals();
-                _navReset();
-                showView('view-student');
-                await openStudentGroup(gid, name, 'practice');
+                if (!onStudentView()) {
+                    // Coming from a different top-level view — need to switch first
+                    showView('view-student');
+                }
+                try {
+                    await openStudentGroup(gid, name, 'practice');
+                } catch(e) {
+                    console.error('bn-practice openStudentGroup error:', e);
+                    showToast('שגיאה בפתיחת התרגולים — נסה שוב', 'error');
+                }
             } else {
-                // No group open — let user pick from their groups
+                // No group open — let user pick from their groups using a proper bottom-sheet
                 closeModals();
-                _navReset();
-                showView('view-student');
-                // Build a quick picker in a toast-like sheet
+                if (!onStudentView()) {
+                    _navReset();
+                    showView('view-student');
+                }
+
                 const existingPicker = document.getElementById('practice-group-picker');
                 if (existingPicker) existingPicker.remove();
-                const picker = document.createElement('div');
-                picker.id = 'practice-group-picker';
-                picker.style.cssText = 'position:fixed;bottom:calc(64px + env(safe-area-inset-bottom,0px));right:0;left:0;z-index:1200;padding:12px 16px;background:var(--surface);border-top:1.5px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,0.12);';
-                picker.innerHTML = '<div style="font-weight:700;font-size:0.9rem;margin-bottom:10px;color:var(--ink);">📚 בחר קורס לתרגול:</div><div id="practice-picker-list" style="display:flex;flex-direction:column;gap:8px;"></div>';
-                document.body.appendChild(picker);
+
+                // Build as a real modal-overlay so backdrop blur fires
+                const overlay = document.createElement('div');
+                overlay.id = 'practice-group-picker';
+                overlay.className = 'modal-overlay';
+                overlay.dataset.noScrollLock = '1'; // picker manages its own scroll — don't lock body
+                overlay.innerHTML = `
+                    <div class="card" style="width:100%;max-width:560px;border-radius:22px 22px 0 0 !important;padding:0 24px 24px !important;max-height:80vh;overflow-y:auto;">
+                        <div class="sheet-handle"></div>
+                        <div style="font-weight:700;font-size:1rem;margin-bottom:14px;color:var(--ink);">📚 בחר קורס לתרגול</div>
+                        <div id="practice-picker-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    </div>`;
+                document.body.appendChild(overlay);
+
+                // Dismiss on overlay tap (outside card)
+                // FIX: use classList.add('hidden') instead of remove() so the scroll-lock
+                // MutationObserver can detect the close and release the body lock.
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) overlay.classList.add('hidden');
+                });
+
                 const list = document.getElementById('practice-picker-list');
-                list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;">טוען...</div>';
+                list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0;">טוען...</div>';
                 try {
                     const snaps = await getDocs(query(
                         collection(db, "groups"),
@@ -6428,27 +6729,40 @@
                     ));
                     list.innerHTML = '';
                     if (snaps.empty) {
-                        list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;">לא רשום לקורסים</div>';
+                        list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:8px 0;">לא רשום לקורסים</div>';
+                        return;
+                    }
+                    // If only one group — skip the picker entirely and go straight in
+                    if (snaps.size === 1) {
+                        overlay.classList.add('hidden');
+                        const onlyGroup = snaps.docs[0];
+                        try {
+                            await openStudentGroup(onlyGroup.id, onlyGroup.data().name, 'practice');
+                        } catch(e) {
+                            console.error('practice-picker single-group error:', e);
+                            showToast('שגיאה בפתיחת התרגולים — נסה שוב', 'error');
+                        }
                         return;
                     }
                     snaps.forEach(gd => {
                         const btn = document.createElement('button');
                         btn.className = 'outline';
-                        btn.style.cssText = 'width:100%;justify-content:flex-start;gap:10px;font-size:0.88rem;';
+                        btn.style.cssText = 'width:100%;justify-content:flex-start;gap:10px;font-size:0.9rem;';
                         btn.innerHTML = `📚 ${safeHTML(gd.data().name)}`;
                         btn.addEventListener('click', async () => {
-                            picker.remove();
-                            await openStudentGroup(gd.id, gd.data().name, 'practice');
+                            // FIX: hide instead of remove, and wrap in try/catch
+                            overlay.classList.add('hidden');
+                            try {
+                                await openStudentGroup(gd.id, gd.data().name, 'practice');
+                            } catch(e) {
+                                console.error('practice-picker openStudentGroup error:', e);
+                                showToast('שגיאה בפתיחת התרגולים — נסה שוב', 'error');
+                            }
                         });
                         list.appendChild(btn);
                     });
-                    // Close picker when tapping elsewhere
-                    setTimeout(() => {
-                        const dismiss = (e) => { if (!picker.contains(e.target)) { picker.remove(); document.removeEventListener('click', dismiss); } };
-                        document.addEventListener('click', dismiss);
-                    }, 100);
                 } catch(e) {
-                    list.innerHTML = '<div style="color:var(--danger);font-size:0.85rem;">שגיאה בטעינה</div>';
+                    list.innerHTML = '<div style="color:var(--danger);font-size:0.85rem;padding:8px 0;">שגיאה בטעינה</div>';
                 }
             }
         });
@@ -6901,11 +7215,10 @@ document.addEventListener('click', () => {
         document.getElementById('btn-back-from-group').addEventListener('click', backFromGroupDetails);
         document.getElementById('btn-home-from-group').addEventListener('click', backFromGroupDetails);
         document.getElementById('btn-back-to-group').addEventListener('click', () => {
-            // FIX 4: Always unsubscribe the live Firestore listener when leaving the session report view.
-            // Without this, the listener stays active in the background and causes unnecessary reads.
             if (state.liveUnsubscribe) { state.liveUnsubscribe(); state.liveUnsubscribe = null; }
-            document.getElementById('session-report-view').classList.add('hidden');
+            const _srv = document.getElementById('session-report-view');
             const _igdb = document.getElementById('instructor-group-details');
+            _animateExit(_srv, 'view-exiting-back', () => _srv.classList.add('hidden'));
             _igdb.classList.remove('hidden');
             _animateEnter(_igdb, 'view-entering-back');
         });
@@ -6919,6 +7232,7 @@ document.addEventListener('click', () => {
             backFromGroupDetails();
         });
         document.getElementById('btn-bypass-gps').addEventListener('click', bypassGpsFor5Mins);
+        document.getElementById('btn-lock-session').addEventListener('click', manualLock);
         document.getElementById('btn-add-round').addEventListener('click', addAttendanceRound);
         // ── Report search box ─────────────────────────────────────────
         const _reportSearchInput = document.getElementById('report-search-input');
@@ -7078,14 +7392,16 @@ document.addEventListener('click', () => {
         })();
 
         document.getElementById('btn-student-back').addEventListener('click', () => {
-            document.getElementById('student-group-details').classList.add('hidden');
+            const _sgd = document.getElementById('student-group-details');
             const _smd = document.getElementById('student-main-dashboard');
+            _animateExit(_sgd, 'view-exiting-back', () => _sgd.classList.add('hidden'));
             _smd.classList.remove('hidden');
             _animateEnter(_smd, 'view-entering-back');
         });
         document.getElementById('btn-student-home').addEventListener('click', () => {
-            document.getElementById('student-group-details').classList.add('hidden');
+            const _sgd = document.getElementById('student-group-details');
             const _smdh = document.getElementById('student-main-dashboard');
+            _animateExit(_sgd, 'view-exiting-back', () => _sgd.classList.add('hidden'));
             _smdh.classList.remove('hidden');
             _animateEnter(_smdh, 'view-entering-back');
         });
@@ -7283,22 +7599,27 @@ document.addEventListener('click', () => {
                 const studentsList = document.getElementById('bc-students-list');
                 if (studentsList.children.length === 0) {
                     studentsList.innerHTML = ihLoader('טוען חניכים...', 'ring');
-                    const snaps = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
-                    studentsList.innerHTML = '';
-                    // Sort client-side to avoid requiring a composite Firestore index
-                    const sortedDocs = [...snaps.docs].sort((a, b) => (a.data().fullName || '').localeCompare(b.data().fullName || '', 'he'));
-                    sortedDocs.forEach(d => {
-                        const u = d.data();
-                        const label = document.createElement('label');
-                        label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:0.9rem;border-bottom:1px solid var(--border-light);';
-                        const cb = document.createElement('input');
-                        cb.type = 'checkbox';
-                        cb.value = d.id;
-                        cb.style.cssText = 'width:auto;margin:0;';
-                        label.appendChild(cb);
-                        label.appendChild(document.createTextNode(u.fullName));
-                        studentsList.appendChild(label);
-                    });
+                    try {
+                        const snaps = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+                        studentsList.innerHTML = '';
+                        // Sort client-side to avoid requiring a composite Firestore index
+                        const sortedDocs = [...snaps.docs].sort((a, b) => (a.data().fullName || '').localeCompare(b.data().fullName || '', 'he'));
+                        sortedDocs.forEach(d => {
+                            const u = d.data();
+                            const label = document.createElement('label');
+                            label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;font-size:0.9rem;border-bottom:1px solid var(--border-light);';
+                            const cb = document.createElement('input');
+                            cb.type = 'checkbox';
+                            cb.value = d.id;
+                            cb.style.cssText = 'width:auto;margin:0;';
+                            label.appendChild(cb);
+                            label.appendChild(document.createTextNode(u.fullName));
+                            studentsList.appendChild(label);
+                        });
+                    } catch(e) {
+                        console.error('bc-target load students error:', e);
+                        studentsList.innerHTML = '<div style="color:var(--danger);font-size:0.85rem;padding:8px 0;">שגיאה בטעינת חניכים</div>';
+                    }
                 }
             }
         });
@@ -8014,13 +8335,14 @@ document.addEventListener('click', () => {
         }
 
         async function openGroup(id, name) {
-            loadSavedLocations(); // pre-load for this group
+            loadSavedLocations();
             state.curGroupId = id;
             _navPush({ type: 'group', id, name });
+            const _imain = document.getElementById('instructor-main');
+            const _igd = document.getElementById('instructor-group-details');
+            _animateExit(_imain, 'view-exiting-forward', () => _imain.classList.add('hidden'));
             document.querySelectorAll('section').forEach(e => e.classList.add('hidden'));
             document.getElementById('view-instructor').classList.remove('hidden');
-            document.getElementById('instructor-main').classList.add('hidden');
-            const _igd = document.getElementById('instructor-group-details');
             _igd.classList.remove('hidden');
             _animateEnter(_igd, 'view-entering-forward');
             // reset to sessions tab
@@ -8103,8 +8425,10 @@ document.addEventListener('click', () => {
             list.innerHTML = '';
             state.allSessionsCache.forEach(s => {
                 let reopenBtn = null;
-                if (s.status === 'closed' && s.createdAt) {
-                    const diff = (new Date().getTime() - s.createdAt.toDate().getTime()) / (1000 * 60 * 60);
+                if (s.status === 'closed') {
+                    // Use closedAt if available; fall back to createdAt for sessions closed before this fix
+                    const _closedTs = s.closedAt || s.createdAt;
+                    const diff = _closedTs ? (new Date().getTime() - _closedTs.toDate().getTime()) / (1000 * 60 * 60) : 0;
                     if (isAdmin() || diff < 48) {
                         reopenBtn = document.createElement('button');
                         reopenBtn.className = 'outline';
@@ -8428,7 +8752,7 @@ document.addEventListener('click', () => {
             try {
                 const sessionSnap = await getDoc(doc(db, "groups", state.curGroupId, "sessions", sid));
                 const sdata = sessionSnap.data();
-                const updates = { status: 'open', expectedEndTime: newEndStr, reopenedAt: serverTimestamp() };
+                const updates = { status: 'open', expectedEndTime: newEndStr, reopenedAt: Date.now(), roundStartedAt: Date.now() };
                 if (sdata && sdata.attendance) {
                     Object.entries(sdata.attendance).forEach(([uid, att]) => {
                         if (att.autoMarked) updates[`attendance.${uid}`] = deleteField();
@@ -8600,8 +8924,9 @@ document.addEventListener('click', () => {
             state.viewingRound = null; // start at current/live round
             state._lastKnownSessionStatus = null; // reset so onSnapshot tracks fresh transitions
             _navPush({ type: 'sessionReport', sid, snum });
-            document.getElementById('instructor-group-details').classList.add('hidden');
+            const _igd2 = document.getElementById('instructor-group-details');
             const _srv = document.getElementById('session-report-view');
+            _animateExit(_igd2, 'view-exiting-forward', () => _igd2.classList.add('hidden'));
             _srv.classList.remove('hidden');
             _animateEnter(_srv, 'view-entering-forward');
             safeText(document.getElementById('report-title'), `מפגש ${snum}`);
@@ -8649,14 +8974,18 @@ document.addEventListener('click', () => {
                     // 2. All group members have a registration (att exists) in this session
                     // אם המפגש נפתח מחדש — בודקים רק רישומים שנוצרו אחרי זמן הפתיחה מחדש
                     if (!shouldAutoLock && state.membersCache && state.membersCache.length > 0) {
-                        const reopenedAt = sdata.reopenedAt; // Firestore Timestamp or null
-                        const allRegistered = state.membersCache.every(m => {
+                        const reopenedAt = sdata.reopenedAt; // Firestore Timestamp, number (Date.now()), or null
+                        const currentAttCount = Object.keys(sdata.attendance || {}).length;
+                        // Guard: don't auto-lock if nobody has registered yet (avoids vacuous-truth lock on empty group)
+                        const allRegistered = currentAttCount > 0 && state.membersCache.every(m => {
                             const att = sdata.attendance?.[m.uid];
                             if (!att || !['on_time', 'late', 'excused', 'absent'].includes(att.status)) return false;
                             // אם המפגש נפתח מחדש — רישום ישן (לפני הפתיחה מחדש) לא נחשב
                             if (reopenedAt && att.timestamp) {
                                 const attTime = att.timestamp.toMillis ? att.timestamp.toMillis() : (att.timestamp.seconds ? att.timestamp.seconds * 1000 : null);
-                                const reopenTime = reopenedAt.toMillis ? reopenedAt.toMillis() : (reopenedAt.seconds ? reopenedAt.seconds * 1000 : null);
+                                // reopenedAt may be a Firestore Timestamp or a plain number (Date.now())
+                                const reopenTime = typeof reopenedAt === 'number' ? reopenedAt
+                                    : (reopenedAt.toMillis ? reopenedAt.toMillis() : (reopenedAt.seconds ? reopenedAt.seconds * 1000 : null));
                                 if (attTime !== null && reopenTime !== null && attTime < reopenTime) return false;
                             }
                             return true;
@@ -8678,6 +9007,7 @@ document.addEventListener('click', () => {
                             });
                         }
                         updates.status = 'closed';
+                        updates.closedAt = serverTimestamp();
                         // Archive final round if multi-round is active
                         if (sdata.rounds > 1 && sdata.attendance) {
                             const lastRound = sdata.rounds - 1;
@@ -8925,7 +9255,7 @@ document.addEventListener('click', () => {
                         statusText: 'בקשה חריגה',
                         statusCls: isUnread ? 'exc-intense' : 'bg-blink-warn',
                         distTxt: exc.timestamp?.toDate
-                            ? `\n${exc.timestamp.toDate().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})} | ${exc.distance || 'לא נדגם'}מ'`
+                            ? `\n${exc.timestamp.toDate().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}${exc.distance != null && exc.distance !== '' ? ' | ' + exc.distance : ''}`
                             : ''
                     };
                 }
@@ -8934,7 +9264,7 @@ document.addEventListener('click', () => {
                     if (isSessionOpen) return { borderColor: 'var(--border)', bgColor: 'var(--surface)', statusText: 'טרם נרשם', statusCls: 'bg-blink-warn', distTxt: '' };
                     return { borderColor: 'var(--border)', bgColor: 'var(--surface-2)', statusText: 'חיסור', statusCls: 'bg-absent-static', distTxt: '' };
                 }
-                const dist = att.distance ? ` (${att.distance}מ'${att.usedFallbackLocation ? ' ⚠️' : ''})` : '';
+                const dist = att.distance ? ` (${att.distance}${att.usedFallbackLocation ? ' ⚠️' : ''})` : '';
                 if (att.status === 'on_time')  return { borderColor: 'var(--green)',  bgColor: 'var(--green-soft)',           statusText: 'נוכח',                          statusCls: 'bg-green',        distTxt: dist };
                 if (att.status === 'late')     return { borderColor: 'var(--amber)',  bgColor: 'var(--amber-soft)',           statusText: `איחור (${att.minutes || 0}דק')`, statusCls: 'bg-yellow',       distTxt: dist };
                 if (att.status === 'excused')  return { borderColor: 'var(--blue)',   bgColor: 'var(--blue-soft)',            statusText: 'באישור',                        statusCls: 'bg-blue',         distTxt: dist };
@@ -8957,9 +9287,10 @@ document.addEventListener('click', () => {
             // ── Open edit modal for a specific round ──────────────────────
             async function openEditForRound(uid, roundIndex, studentName) {
                 if (!isAdmin() && sdata.status === 'closed') {
-                    const createdAt = sdata.createdAt;
-                    if (createdAt) {
-                        const t = createdAt.toMillis ? createdAt.toMillis() : (createdAt.seconds ? createdAt.seconds * 1000 : 0);
+                    // Use closedAt if available; fall back to createdAt for sessions closed before this fix
+                    const _closedRef = sdata.closedAt || sdata.createdAt;
+                    if (_closedRef) {
+                        const t = _closedRef.toMillis ? _closedRef.toMillis() : (_closedRef.seconds ? _closedRef.seconds * 1000 : 0);
                         if ((Date.now() - t) / 3600000 >= 48) {
                             await appDialog({ title: 'לא ניתן לערוך', message: 'ניתן לערוך נוכחות רק תוך 48 שעות מסגירת המפגש.', confirmText: 'סגור' });
                             return;
@@ -8981,7 +9312,7 @@ document.addEventListener('click', () => {
                         const reasonLabel = exc.excReason ? (EXC_REASON_LABELS[exc.excReason] || exc.excReason) : null;
                         const noteText    = exc.excNote || null;
                         safeText(document.getElementById('es-exception-info'),
-                            `בקשה חריגה | מרחק: ${exc.distance || 'לא נדגם'}מ' | נשלחה: ${excTime}${exc.snoozed ? ' | 🕐 בהמתנה' : ''}${reasonLabel ? ' | ' + reasonLabel : ''}${noteText ? ' — ' + noteText : ''}`
+                            `בקשה חריגה | מרחק: ${exc.distance || 'GPS לא זמין'} | נשלחה: ${excTime}${exc.snoozed ? ' | 🕐 בהמתנה' : ''}${reasonLabel ? ' | ' + reasonLabel : ''}${noteText ? ' — ' + noteText : ''}`
                         );
                         if (excActionsPanel) excActionsPanel.style.display = 'block';
                         state._curExcData = exc; // save for approve handler
@@ -9175,7 +9506,7 @@ document.addEventListener('click', () => {
                 if (exc.distance != null && exc.distance !== '') {
                     const distRow = document.createElement('p');
                     distRow.style.cssText = 'font-size:0.9rem;margin-bottom:0;';
-                    distRow.innerHTML = `מרחק שנמדד: <strong style="color:var(--danger);">${safeHTML(String(exc.distance))} מטרים</strong>`;
+                    distRow.innerHTML = `מרחק שנמדד: <strong style="color:var(--danger);">${safeHTML(String(exc.distance))}</strong>`;
                     eamText.appendChild(distRow);
                 }
 
@@ -9327,26 +9658,28 @@ document.addEventListener('click', () => {
                     : (sd.exceptions?.[uid] || excData);
 
                 // Determine attendance status from exc timestamp
+                // Use same reference-time logic as startAttendProcess:
+                // refTime = max(roundStartedAt, expectedStartTime) so each round has its own grace window.
                 let attStatus = 'on_time';
                 let lateMins  = 0;
                 const excTs = freshExcData?.timestamp?.toDate ? freshExcData.timestamp.toDate() : null;
-                if (startTime && excTs) {
-                    const [sh, sm] = startTime.split(':').map(Number);
-                    const sessionDt = new Date(excTs);
-                    sessionDt.setHours(sh, sm, 0, 0);
-                    const msSinceStart = excTs.getTime() - sessionDt.getTime();
-                    if (msSinceStart > graceMins * 60000) {
-                        attStatus = 'late';
-                        lateMins  = Math.max(1, Math.round(msSinceStart / 60000));
+                if (excTs) {
+                    let schedDt = null;
+                    if (startTime) {
+                        const [sh, sm] = startTime.split(':').map(Number);
+                        schedDt = new Date(excTs); schedDt.setHours(sh, sm, 0, 0);
                     }
-                } else if (!startTime) {
-                    // No scheduled start — use roundStartedAt
-                    const openedTs = sd.roundStartedAt ? new Date(sd.roundStartedAt) : null;
-                    if (openedTs && excTs) {
-                        const msSinceOpen = excTs.getTime() - openedTs.getTime();
-                        if (msSinceOpen > graceMins * 60000) {
+                    const openedDt = sd.roundStartedAt ? new Date(sd.roundStartedAt) : null;
+                    // Effective reference = max(schedDt, openedDt), same as startAttendProcess
+                    let refDt = null;
+                    if (schedDt && openedDt) refDt = new Date(Math.max(schedDt.getTime(), openedDt.getTime()));
+                    else if (schedDt) refDt = schedDt;
+                    else if (openedDt) refDt = openedDt;
+                    if (refDt) {
+                        const msSinceRef = excTs.getTime() - refDt.getTime();
+                        if (msSinceRef > graceMins * 60000) {
                             attStatus = 'late';
-                            lateMins  = Math.max(1, Math.round(msSinceOpen / 60000));
+                            lateMins  = Math.max(1, Math.round(msSinceRef / 60000));
                         }
                     }
                 }
@@ -9503,16 +9836,23 @@ document.addEventListener('click', () => {
         }
 
         async function manualLock() {
+            // Capture the target session ID NOW, before any await.
+            // If the user navigates away while the confirm dialog is open, state.curSessionId
+            // could change — without this capture we would lock the wrong session.
+            const _lockTargetSid = state.curSessionId;
+            const _lockTargetGid = state.curGroupId;
+            if (!_lockTargetSid || !_lockTargetGid) return;
             const confirmed = await appDialog({ title: 'סגירת מפגש', message: 'לסגור את רישום הנוכחות? לא ניתן לשחזר.', confirmText: 'סגור רישום', cancelText: 'ביטול', danger: true });
             if (!confirmed) return;
             const lockBtn = document.getElementById('btn-lock-session');
             await withTimeout(async () => {
                 // Archive final round attendance if multi-round is active
-                const sessionRef = doc(db, "groups", state.curGroupId, "sessions", state.curSessionId);
+                const sessionRef = doc(db, "groups", _lockTargetGid, "sessions", _lockTargetSid);
                 const snapLock = await getDoc(sessionRef);
                 const sdataLock = snapLock.data();
-                const finalUpdates = { status: 'closed' };
-                if (sdataLock && sdataLock.rounds > 1 && sdataLock.attendance) {
+                if (!sdataLock) { showToast('המפגש לא נמצא — נסה שוב', 'error'); return; }
+                const finalUpdates = { status: 'closed', closedAt: serverTimestamp() };
+                if (sdataLock.rounds > 1 && sdataLock.attendance) {
                     const lastRound = sdataLock.rounds - 1;
                     // FIX 2: Store full status object in final round archive (not just boolean)
                     Object.entries(sdataLock.attendance).forEach(([uid, att]) => {
@@ -9528,7 +9868,7 @@ document.addEventListener('click', () => {
                     });
                 }
                 await updateDoc(sessionRef, finalUpdates);
-                writeLog('session', `נעילה ידנית של מפגש ${state.liveSessionNumber} | קבוצה: ${state.curGroupId}`);
+                writeLog('session', `נעילה ידנית של מפגש ${state.liveSessionNumber} | קבוצה: ${_lockTargetGid}`);
                 if (state.liveUnsubscribe) { state.liveUnsubscribe(); state.liveUnsubscribe = null; }
                 document.getElementById('session-report-view').classList.add('hidden');
                 const _igdml = document.getElementById('instructor-group-details');
@@ -9620,7 +9960,7 @@ document.addEventListener('click', () => {
                     if (wasEverPresent) {
                         const att = sdata.attendance?.[student.uid];
                         const distRaw = att?.distance;
-                        const distStr = (distRaw !== undefined && distRaw !== null && distRaw !== '') ? `${distRaw}מ'` : 'לא נמדד';
+                        const distStr = (distRaw !== undefined && distRaw !== null && distRaw !== '') ? `${distRaw}` : '';
                         if (lateCount > 0) {
                             lateArr.push({ name: student.name, dist: distStr, reason: `${lateCount} סיבובים באיחור`, uid: student.uid });
                         } else {
@@ -9645,7 +9985,7 @@ document.addEventListener('click', () => {
                 presentMembers.forEach(student => {
                     const att = sdata.attendance?.[student.uid];
                     const distRaw = att?.distance;
-                    const distStr = (distRaw !== undefined && distRaw !== null && distRaw !== '') ? `${distRaw}מ'` : 'לא נמדד';
+                    const distStr = (distRaw !== undefined && distRaw !== null && distRaw !== '') ? `${distRaw}` : '';
                     if (att.status === 'late') {
                         const mins = att.minutes || 0;
                         const reason = mins > 0 ? `${mins} דק' איחור` : 'איחור';
@@ -9954,7 +10294,7 @@ document.addEventListener('click', () => {
                     arrivalStr = d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
                 }
                 if (att?.distance != null && att.distance !== '') {
-                    distStr = `${att.distance}מ׳`;
+                    distStr = att.distance.endsWith('מ\'') ? 'במקום' : 'מיקום אושר ידנית';
                 }
 
                 const div = document.createElement('div');
@@ -10213,6 +10553,124 @@ document.addEventListener('click', () => {
             }, 300);
         }
 
+        // ── CONVERT ATTEND CARD TO REGISTERED (green) STATE ─────────────
+        // Called immediately after a successful attendance save so the card
+        // stays visible but switches to a green "מפגש פעיל" style.
+        // sessionInfo = { sessionNumber, expectedStartTime, expectedEndTime, locationName, _gname, sessionId, gid, scheduledDate }
+        // attInfo     = { status, minutes, timestamp }
+        function _convertCardToRegistered(sid, sessionInfo, attInfo) {
+            const card = document.querySelector('[data-sid="' + sid + '"]');
+            if (!card) return;
+
+            const isLate      = attInfo.status === 'late';
+            const lateMinutes = attInfo.minutes || 0;
+            const now         = new Date();
+            const timeStr     = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+
+            // ── Stop the live countdown timer before touching the DOM ────
+            // The countdown pill is still in the DOM, so the MutationObserver
+            // won't fire. We need to explicitly stop the setInterval via a
+            // custom attribute on the pill element.
+            const existingPill = card.querySelector('.ssa-countdown');
+            if (existingPill && existingPill._countdownStop) {
+                existingPill._countdownStop();
+            }
+
+            // Mark card as registered so CSS applies green style
+            card.classList.add('ssa-registered');
+            card.dataset.registered = '1';
+
+            // ── Rebuild header — green ───────────────────────────────────
+            const oldHeader = card.querySelector('.ssa-header');
+            if (oldHeader) {
+                oldHeader.classList.add('ssa-header-green');
+                const labelEl = oldHeader.querySelector('.ssa-header-label');
+                const iconEl  = oldHeader.querySelector('.ssa-header-icon');
+                if (labelEl) labelEl.textContent = 'מפגש פעיל';
+                if (iconEl)  iconEl.textContent  = '✅';
+            }
+
+            // ── Rebuild body ─────────────────────────────────────────────
+            const body = card.querySelector('.ssa-body');
+            if (body) {
+                // Replace countdown pill text with "נרשמת ✓" — stop timer first
+                const countdown = body.querySelector('.ssa-countdown');
+                if (countdown) {
+                    countdown.className = 'ssa-countdown';
+                    countdown.style.cssText = 'background:rgba(5,150,105,0.1);border-color:rgba(5,150,105,0.3);color:#059669;';
+                    countdown.textContent = isLate
+                        ? `⏱ נרשמת כמאחר · ${lateMinutes} דק׳`
+                        : '✓ נרשמת';
+                }
+
+                // Remove all buttons
+                body.querySelectorAll('button, .ssa-attend-btn').forEach(b => b.remove());
+
+                // Add registration detail strip
+                const strip = document.createElement('div');
+                strip.className = 'ssa-registered-strip';
+                strip.innerHTML = `<span>✅ נוכחות נרשמה בהצלחה</span>`;
+                body.appendChild(strip);
+
+                const chipWrap = document.createElement('div');
+                chipWrap.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;padding:6px 18px 4px;';
+
+                const timeChip = document.createElement('span');
+                timeChip.className = 'ssa-reg-detail-chip';
+                timeChip.textContent = `🕐 ${timeStr}`;
+                chipWrap.appendChild(timeChip);
+
+                if (isLate) {
+                    const lateChip = document.createElement('span');
+                    lateChip.className = 'ssa-reg-detail-chip late';
+                    lateChip.textContent = `⏱ איחור ${lateMinutes} דק׳`;
+                    chipWrap.appendChild(lateChip);
+                } else {
+                    const onTimeChip = document.createElement('span');
+                    onTimeChip.className = 'ssa-reg-detail-chip';
+                    onTimeChip.textContent = '⚡ בזמן';
+                    chipWrap.appendChild(onTimeChip);
+                }
+
+                if (sessionInfo.sessionNumber) {
+                    const snChip = document.createElement('span');
+                    snChip.className = 'ssa-reg-detail-chip';
+                    snChip.textContent = `מפגש ${sessionInfo.sessionNumber}`;
+                    chipWrap.appendChild(snChip);
+                }
+                body.appendChild(chipWrap);
+
+                const tapHint = document.createElement('div');
+                tapHint.style.cssText = 'font-size:0.72rem;color:var(--muted);padding:0 18px 12px;display:flex;align-items:center;gap:4px;';
+                tapHint.textContent = '⬆ לחץ לפרטי הרישום';
+                body.appendChild(tapHint);
+            }
+
+            // ── Wire click to open session status view ────────────────────
+            // Clone-replace technique removes all previously attached listeners
+            const cardClone = card.cloneNode(true);
+            card.parentNode?.replaceChild(cardClone, card);
+            const _uid = auth.currentUser?.uid;
+            cardClone.addEventListener('click', () => {
+                const sessionForView = {
+                    ...sessionInfo,
+                    status: 'open',
+                    attendance: _uid ? { [_uid]: { status: attInfo.status, minutes: attInfo.minutes, timestamp: null } } : {},
+                    _registeredLocally: true,
+                    _regTimeStr: timeStr,
+                };
+                if (_uid) openSessionStatusView(sessionForView, _uid);
+            });
+
+            // Update tab bud pill to green ✓
+            const sessionForBud = {
+                ...sessionInfo,
+                scheduledDate: sessionInfo.scheduledDate || new Date().toLocaleDateString('en-CA'),
+                expectedStartTime: sessionInfo.expectedStartTime || '00:00',
+            };
+            startTabBudWatcher(sessionForBud, true);
+        }
+
         // ── TAB BUD WATCHER ─────────────────────────────────────────────
         // Shows a fixed pill (top-left) with a live seconds-countdown when a
         // scheduled session is opening within the next 15 minutes.
@@ -10231,7 +10689,7 @@ document.addEventListener('click', () => {
             const dash = document.getElementById('student-main-dashboard');
             const body = document.getElementById('ssv-body');
 
-            dash.classList.add('hidden');
+            _animateExit(dash, 'view-exiting-forward', () => dash.classList.add('hidden'));
             view.classList.remove('hidden');
             _animateEnter(view, 'view-entering-forward');
 
@@ -10243,7 +10701,8 @@ document.addEventListener('click', () => {
             // ── Timing ───────────────────────────────────────────────────
             const earlyMins  = session.openMinutesBefore != null ? session.openMinutesBefore : 5;
             const graceMins  = session.graceMins != null ? session.graceMins : 15;
-            const sessionDt  = new Date(session.scheduledDate + 'T' + (session.expectedStartTime || '00:00') + ':00');
+            const _sdBase    = session.scheduledDate || new Date().toLocaleDateString('en-CA');
+            const sessionDt  = new Date(_sdBase + 'T' + (session.expectedStartTime || '00:00') + ':00');
             const openDt     = new Date(sessionDt.getTime() - earlyMins * 60000);
             const graceEndDt = new Date(sessionDt.getTime() + graceMins * 60000);
 
@@ -10314,38 +10773,125 @@ document.addEventListener('click', () => {
                 if (phase === 'registered') {
                     body.style.cssText = 'padding:0;display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;';
 
-                    const card = document.createElement('div');
-                    card.style.cssText = 'width:100%;background:linear-gradient(160deg,#064e3b 0%,#065f46 40%,#047857 100%);padding:36px 24px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;';
+                    const isLate     = myAtt.status === 'late';
+                    const lateMin    = myAtt.minutes || 0;
+                    const myExc      = session.exceptions?.[uid];
+                    const excStatus  = myExc?.resolvedStatus;
+                    const hasExc     = !!(myExc && myExc.type === 'manual_request');
 
-
+                    // ── Hero banner ──────────────────────────────────────
+                    const heroCard = document.createElement('div');
+                    heroCard.style.cssText = 'width:100%;background:linear-gradient(160deg,#064e3b 0%,#065f46 40%,#047857 100%);padding:36px 24px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;';
 
                     const iconWrap = document.createElement('div');
                     iconWrap.style.cssText = 'width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 0 14px rgba(255,255,255,0.06);';
-                    iconWrap.textContent = '\u2705';
-                    card.appendChild(iconWrap);
+                    iconWrap.textContent = '✅';
+                    heroCard.appendChild(iconWrap);
 
                     const h = document.createElement('div');
                     h.style.cssText = 'font-family:"Syne",sans-serif;font-size:1.7rem;font-weight:900;color:#fff;line-height:1.1;';
-                    h.textContent = '\u05E0\u05E8\u05E9\u05DE\u05EA \u05D1\u05D4\u05E6\u05DC\u05D7\u05D4!';
-                    card.appendChild(h);
+                    h.textContent = 'נוכחות נרשמה בהצלחה!';
+                    heroCard.appendChild(h);
 
-                    const isLate = myAtt.status === 'late';
+                    // Status tag
                     const tag = document.createElement('div');
                     tag.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:5px 16px;font-size:0.83rem;font-weight:700;color:#d1fae5;';
-                    tag.textContent = isLate ? ('\u23F1 \u05E0\u05E8\u05E9\u05DE\u05EA \u05DB\u05DE\u05D0\u05D7\u05E8 \u00B7 ' + (myAtt.minutes || 0) + ' \u05D3\u05E7\'') : '\u2713 \u05E0\u05E8\u05E9\u05DE\u05EA \u05D1\u05D6\u05DE\u05DF';
-                    card.appendChild(tag);
+                    if (hasExc) {
+                        if (excStatus === 'approved')     tag.textContent = '✅ בקשה חריגה — אושרה על ידי המדריך';
+                        else if (excStatus === 'denied')  tag.textContent = '❌ בקשה חריגה — נדחתה';
+                        else                              tag.textContent = '⏳ בקשה חריגה — ממתין לאישור';
+                    } else {
+                        tag.textContent = isLate ? `⏱ נרשמת כמאחר · ${lateMin} דק׳` : '✓ נרשמת בזמן';
+                    }
+                    heroCard.appendChild(tag);
 
+                    // Registration time
                     const timeEl = document.createElement('div');
                     timeEl.id = 'ssv-reg-time';
                     timeEl.style.cssText = 'font-size:0.88rem;color:rgba(255,255,255,0.65);font-weight:500;';
-                    card.appendChild(timeEl);
+                    heroCard.appendChild(timeEl);
 
-                    body.appendChild(card);
+                    body.appendChild(heroCard);
 
-                    const metaWrap = document.createElement('div');
-                    metaWrap.style.cssText = 'padding:20px 18px 0;width:100%;box-sizing:border-box;';
-                    metaWrap.appendChild(makeMeta());
-                    body.appendChild(metaWrap);
+                    // ── Detail cards ─────────────────────────────────────
+                    const detailWrap = document.createElement('div');
+                    detailWrap.style.cssText = 'padding:20px 18px 24px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;text-align:right;';
+
+                    // Session meta chips — makeMeta() already returns a flex row
+                    const metaDiv = makeMeta();
+                    metaDiv.style.marginBottom = '4px';
+                    detailWrap.appendChild(metaDiv);
+
+                    // Registration details card
+                    const regDetailsCard = document.createElement('div');
+                    regDetailsCard.style.cssText = 'background:var(--surface-2);border:1.5px solid rgba(5,150,105,0.2);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;';
+
+                    const regTitle = document.createElement('div');
+                    regTitle.style.cssText = 'font-size:0.78rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px;';
+                    regTitle.textContent = 'פרטי הרישום';
+                    regDetailsCard.appendChild(regTitle);
+
+                    // Status row
+                    const makeRow = (icon, label, val, valColor) => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;font-size:0.88rem;';
+                        const lbl = document.createElement('span');
+                        lbl.style.cssText = 'color:var(--muted);display:flex;align-items:center;gap:5px;';
+                        lbl.innerHTML = `<span>${icon}</span>${label}`;
+                        const val2 = document.createElement('span');
+                        val2.style.cssText = 'font-weight:700;color:' + (valColor || 'var(--ink)') + ';';
+                        val2.textContent = val;
+                        row.appendChild(lbl); row.appendChild(val2);
+                        return row;
+                    };
+
+                    // Status
+                    const statusText = isLate ? `מאחר (${lateMin} דק׳)` : 'בזמן';
+                    const statusColor = isLate ? 'var(--amber)' : 'var(--green)';
+                    regDetailsCard.appendChild(makeRow('🎯', 'סטטוס', statusText, statusColor));
+
+                    // Registration time — filled by tick
+                    const regTimeRow = document.createElement('div');
+                    regTimeRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;font-size:0.88rem;';
+                    const regTimeLbl = document.createElement('span'); regTimeLbl.style.cssText = 'color:var(--muted);display:flex;align-items:center;gap:5px;'; regTimeLbl.innerHTML = '<span>🕐</span>שעת רישום';
+                    const regTimeVal = document.createElement('span'); regTimeVal.id = 'ssv-reg-time-detail'; regTimeVal.style.cssText = 'font-weight:700;color:var(--ink);';
+                    regTimeRow.appendChild(regTimeLbl); regTimeRow.appendChild(regTimeVal);
+                    regDetailsCard.appendChild(regTimeRow);
+
+                    // Session number
+                    if (session.sessionNumber) regDetailsCard.appendChild(makeRow('📋', 'מספר מפגש', `מפגש ${session.sessionNumber}`));
+
+                    // Late note if exists
+                    if (myAtt.lateReason) {
+                        regDetailsCard.appendChild(makeRow('💬', 'סיבת איחור', myAtt.lateReason, 'var(--amber)'));
+                    }
+
+                    detailWrap.appendChild(regDetailsCard);
+
+                    // Exception details card if relevant
+                    if (hasExc) {
+                        const excCard = document.createElement('div');
+                        const excBorder = excStatus === 'approved' ? 'rgba(5,150,105,0.3)' : excStatus === 'denied' ? 'rgba(220,38,38,0.3)' : 'rgba(245,158,11,0.3)';
+                        excCard.style.cssText = `background:var(--surface-2);border:1.5px solid ${excBorder};border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;`;
+
+                        const excTitle = document.createElement('div');
+                        excTitle.style.cssText = 'font-size:0.78rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:2px;';
+                        excTitle.textContent = 'פרטי בקשה חריגה';
+                        excCard.appendChild(excTitle);
+
+                        const excSt = excStatus === 'approved' ? 'אושרה ✅' : excStatus === 'denied' ? 'נדחתה ❌' : 'ממתינה לאישור ⏳';
+                        const excStColor = excStatus === 'approved' ? 'var(--green)' : excStatus === 'denied' ? 'var(--danger)' : 'var(--amber)';
+                        excCard.appendChild(makeRow('📝', 'סטטוס הבקשה', excSt, excStColor));
+                        if (myExc.note) excCard.appendChild(makeRow('💬', 'הערת הבקשה', myExc.note));
+                        if (myExc.resolvedAt) {
+                            const rAt = myExc.resolvedAt.toDate ? myExc.resolvedAt.toDate() : new Date(myExc.resolvedAt);
+                            excCard.appendChild(makeRow('🕐', 'זמן החלטה', rAt.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })));
+                        }
+
+                        detailWrap.appendChild(excCard);
+                    }
+
+                    body.appendChild(detailWrap);
 
                 } else if (phase === 'countdown') {
                     body.appendChild(makeMeta());
@@ -10433,15 +10979,29 @@ document.addEventListener('click', () => {
                 const now = Date.now();
 
                 if (phase === 'registered') {
+                    // Fill hero subtitle with session-relative time
                     const el = document.getElementById('ssv-reg-time');
-                    if (!el) return;
-                    if (now < sessionDt.getTime()) {
-                        const msLeft = sessionDt.getTime() - now;
-                        const mins = Math.floor(msLeft / 60000), secs = Math.floor((msLeft % 60000) / 1000);
-                        el.textContent = '\u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 \u05D9\u05EA\u05D7\u05D9\u05DC \u05D1\u05E2\u05D5\u05D3 ' + (mins > 0 ? mins + ':' + String(secs).padStart(2,'0') + ' \u05D3\u05E7\u05D5\u05EA' : secs + ' \u05E9\u05E0\u05D9\u05D5\u05EA');
-                    } else {
-                        const mins = Math.floor((now - sessionDt.getTime()) / 60000);
-                        el.textContent = mins > 0 ? '\u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 \u05D4\u05EA\u05D7\u05D9\u05DC \u05DC\u05E4\u05E0\u05D9 ' + mins + ' \u05D3\u05E7\u05D5\u05EA' : '\u05D4\u05E9\u05D9\u05E2\u05D5\u05E8 \u05D4\u05EA\u05D7\u05D9\u05DC \u05D4\u05E8\u05D2\u05E2';
+                    if (el) {
+                        if (now < sessionDt.getTime()) {
+                            const msLeft = sessionDt.getTime() - now;
+                            const mins = Math.floor(msLeft / 60000), secs = Math.floor((msLeft % 60000) / 1000);
+                            el.textContent = 'השיעור יתחיל בעוד ' + (mins > 0 ? mins + ':' + String(secs).padStart(2,'0') + ' דקות' : secs + ' שניות');
+                        } else {
+                            const mins = Math.floor((now - sessionDt.getTime()) / 60000);
+                            el.textContent = mins > 0 ? 'השיעור התחיל לפני ' + mins + ' דקות' : 'השיעור התחיל הרגע';
+                        }
+                    }
+                    // Fill registration time detail row
+                    const detailEl = document.getElementById('ssv-reg-time-detail');
+                    if (detailEl && !detailEl.textContent) {
+                        try {
+                            if (myAtt?.timestamp) {
+                                const ts = myAtt.timestamp.toDate ? myAtt.timestamp.toDate() : new Date(myAtt.timestamp);
+                                if (!isNaN(ts.getTime())) detailEl.textContent = ts.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                            } else if (session._regTimeStr) {
+                                detailEl.textContent = session._regTimeStr;
+                            }
+                        } catch(e) { detailEl.textContent = '—'; }
                     }
                 } else if (phase === 'countdown') {
                     const msLeft = openDt.getTime() - now; if (msLeft <= 0) return;
@@ -10468,7 +11028,7 @@ document.addEventListener('click', () => {
                         }
                         clk.innerHTML = topRow
                             + '<div style="display:inline-flex;align-items:center;gap:4px;direction:ltr;">'
-                            + (d > 0 ? unit(h,'שע') + sep : '')
+                            + (d > 0 || h > 0 ? unit(h,'שע') + sep : '')
                             + unit(m,'דק') + sep + unit(s,'שנ')
                             + '</div>';
                     }
@@ -10524,7 +11084,7 @@ document.addEventListener('click', () => {
             }
         }
 
-        function startTabBudWatcher(nextSession) {
+        function startTabBudWatcher(nextSession, alreadyRegistered) {
             const bud     = document.getElementById('tab-session-bud');
             const budText = document.getElementById('tab-session-bud-text');
             if (_tabBudTimer) { clearInterval(_tabBudTimer); _tabBudTimer = null; }
@@ -10536,6 +11096,14 @@ document.addEventListener('click', () => {
             const sessionDt = new Date(nextSession.scheduledDate + 'T' + nextSession.expectedStartTime + ':00');
             const openDt    = new Date(sessionDt.getTime() - earlyMins * 60000);
             const SHOW_AHEAD_MS = 15 * 60000; // show bud within 15 min before open time
+
+            // If already registered for an open session today — show green ✓ pill
+            if (alreadyRegistered) {
+                if (_tabBudTimer) { clearInterval(_tabBudTimer); _tabBudTimer = null; }
+                budText.textContent = 'נרשמת ✓';
+                bud.className = 'visible registered';
+                return;
+            }
 
             function _tick() {
                 const now      = Date.now();
@@ -10665,16 +11233,85 @@ document.addEventListener('click', () => {
                     })();
 
                     if (session.status !== 'open' && !isScheduledNowOpen) return;
-                    if (myAtt) return; // already attended — no card needed
 
-                    const _sessionExpired = (() => {
-                        if (session.status !== 'open') return false;
+                    // Expired = endTime passed (regardless of whether instructor closed manually)
+                    const _expired = (() => {
                         if (!session.expectedEndTime) return false;
                         const [eh, em] = session.expectedEndTime.split(':').map(Number);
                         const endDt = new Date(); endDt.setHours(eh, em, 0, 0);
                         return Date.now() > endDt.getTime();
                     })();
-                    if (_sessionExpired) return;
+                    if (_expired) return; // hide both red and green cards after end time
+
+                    // If already registered — keep existing card or build a minimal green one
+                    if (myAtt) {
+                        const existingReg = openSessionsCont.querySelector('[data-sid="' + sd.id + '"][data-registered="1"]');
+                        if (existingReg) {
+                            // Move (not clone) to preserve event listeners
+                            frag.appendChild(existingReg);
+                        } else {
+                            // Card was removed (e.g. approved exception flow removed it).
+                            // Build a fresh registered card so student still sees confirmation.
+                            const isLateAtt  = myAtt.status === 'late';
+                            const lateMinAtt = myAtt.minutes || 0;
+                            const regTimeStr = myAtt.timestamp
+                                ? (myAtt.timestamp.toDate ? myAtt.timestamp.toDate() : new Date(myAtt.timestamp)).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+                                : '';
+
+                            const freshCard = document.createElement('div');
+                            freshCard.className = 'student-session-alert ssa-registered';
+                            freshCard.dataset.sid = sd.id;
+                            freshCard.dataset.registered = '1';
+                            freshCard.dataset.excState = 'none';
+
+                            const fH = document.createElement('div');
+                            fH.className = 'ssa-header ssa-header-green';
+                            fH.innerHTML = `<div class="ssa-header-icon">✅</div><div class="ssa-header-text"><div class="ssa-header-label">מפגש פעיל</div><div class="ssa-header-title">${gd.data().name}</div></div>`;
+                            freshCard.appendChild(fH);
+
+                            const fB = document.createElement('div');
+                            fB.className = 'ssa-body';
+
+                            const fMeta = document.createElement('div');
+                            fMeta.className = 'ssa-meta-row';
+                            if (session.sessionNumber) { const c = document.createElement('span'); c.className = 'ssa-meta-chip'; c.textContent = `מפגש ${session.sessionNumber}`; fMeta.appendChild(c); }
+                            if (session.expectedStartTime) { const c = document.createElement('span'); c.className = 'ssa-meta-chip'; c.innerHTML = `⏰ ${session.expectedStartTime}${session.expectedEndTime ? '–' + session.expectedEndTime : ''}`; fMeta.appendChild(c); }
+                            fB.appendChild(fMeta);
+
+                            const fPill = document.createElement('div');
+                            fPill.className = 'ssa-countdown';
+                            fPill.style.cssText = 'background:rgba(5,150,105,0.1);border-color:rgba(5,150,105,0.3);color:#059669;';
+                            fPill.textContent = isLateAtt ? `⏱ נרשמת כמאחר · ${lateMinAtt} דק׳` : '✓ נרשמת';
+                            fB.appendChild(fPill);
+
+                            const fStrip = document.createElement('div');
+                            fStrip.className = 'ssa-registered-strip';
+                            fStrip.innerHTML = '<span>✅ נוכחות נרשמה בהצלחה</span>';
+                            fB.appendChild(fStrip);
+
+                            if (regTimeStr) {
+                                const fChips = document.createElement('div');
+                                fChips.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;padding:4px 18px 8px;';
+                                const tC = document.createElement('span'); tC.className = 'ssa-reg-detail-chip'; tC.textContent = `🕐 ${regTimeStr}`; fChips.appendChild(tC);
+                                if (isLateAtt) { const lC = document.createElement('span'); lC.className = 'ssa-reg-detail-chip late'; lC.textContent = `⏱ איחור ${lateMinAtt} דק׳`; fChips.appendChild(lC); }
+                                else { const oC = document.createElement('span'); oC.className = 'ssa-reg-detail-chip'; oC.textContent = '⚡ בזמן'; fChips.appendChild(oC); }
+                                fB.appendChild(fChips);
+                            }
+
+                            const fHint = document.createElement('div');
+                            fHint.style.cssText = 'font-size:0.72rem;color:var(--muted);padding:0 18px 10px;';
+                            fHint.textContent = '⬆ לחץ לפרטי הרישום';
+                            fB.appendChild(fHint);
+                            freshCard.appendChild(fB);
+
+                            freshCard.addEventListener('click', () => {
+                                const sessionWithMeta = { ...session, _gname: gd.data().name };
+                                openSessionStatusView(sessionWithMeta, uid);
+                            });
+                            frag.appendChild(freshCard);
+                        }
+                        return;
+                    }
 
                     // Only rebuild the card if something attendance-relevant changed.
                     // Check existing card — if the exception state matches, skip.
@@ -10736,6 +11373,30 @@ document.addEventListener('click', () => {
                     }
                     ssaBody.appendChild(metaRow);
 
+                    // Static time indicator (no setInterval to avoid memory leaks in refresh path)
+                    if (session.expectedStartTime) {
+                        const [sh, sm] = session.expectedStartTime.split(':').map(Number);
+                        const startDt = new Date(); startDt.setHours(sh, sm, 0, 0);
+                        const nowMs = Date.now();
+                        const graceMinsR = session.graceMins != null ? session.graceMins : 15;
+                        const graceEndDtR = new Date(startDt.getTime() + graceMinsR * 60000);
+                        const pill = document.createElement('div');
+                        pill.className = 'ssa-countdown';
+                        if (nowMs < startDt.getTime()) {
+                            const minsLeft = Math.ceil((startDt.getTime() - nowMs) / 60000);
+                            pill.textContent = `⏰ מתחיל בעוד ${minsLeft} דק׳`;
+                        } else if (nowMs < graceEndDtR.getTime()) {
+                            const minsLate = Math.floor((nowMs - startDt.getTime()) / 60000);
+                            pill.textContent = minsLate > 0 ? `⚡ השיעור התחיל — ${minsLate} דק׳ איחור` : '⚡ השיעור התחיל הרגע';
+                            pill.style.cssText = 'background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--amber);';
+                        } else {
+                            const minsLate = Math.floor((nowMs - startDt.getTime()) / 60000);
+                            pill.textContent = `⏱ ${minsLate} דק׳ איחור`;
+                            pill.style.cssText = 'background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.25);color:var(--danger);';
+                        }
+                        ssaBody.appendChild(pill);
+                    }
+
                     if (exc && exc.type === 'manual_request') {
                         if (excStatus === 'approved') {
                             const btn = document.createElement('button');
@@ -10755,6 +11416,8 @@ document.addEventListener('click', () => {
                             btn.style.cssText = 'background:var(--amber);box-shadow:none;cursor:default;';
                             btn.textContent = '⏳ בקשה חריגה בטיפול — ממתין לאישור מדריך';
                             ssaBody.appendChild(btn);
+                            // Cancel any existing listener before starting a new one
+                            if (_excListenerUnsub) { try { _excListenerUnsub(); } catch(_){} _excListenerUnsub = null; }
                             startExcResultListener(gd.id, sd.id, uid);
                         }
                     } else {
@@ -10818,6 +11481,7 @@ document.addEventListener('click', () => {
             alerts.innerHTML = '';
             // Do NOT clear openSessionsCont here — swap atomically after data loads to prevent flicker
             const _openSessionsFrag = document.createDocumentFragment();
+            let _registeredOpenSession = null; // tracks first open session where student is registered
             if (instructorMsgCont) instructorMsgCont.innerHTML = '';
             statsCont.innerHTML = '';
             cont.innerHTML = ihLoader('טוען...', 'ring');
@@ -10993,16 +11657,108 @@ document.addEventListener('click', () => {
         }
     }
 
-    // 2. הצגת כרטיס דיווח - מתבצע רק עבור מפגשים פתוחים שהמשתמש טרם דיווח בהם
-    // Guard: if session has an expectedEndTime that has already passed, don't show the card.
-    // The student would get an error anyway when trying to register, so we suppress it here.
+    // 2. הצגת כרטיסי מפגש — אדום (לא רשום) וירוק (רשום)
+    // _sessionExpired: true כאשר שעת הסיום הרשומה עברה (אך המדריך טרם סגר ידנית)
     const _sessionExpired = (() => {
-        if (session.status !== 'open') return false; // scheduled-now-open: no server endTime to check
-        if (!session.expectedEndTime) return false;
+        if (!session.expectedEndTime) return false; // אין שעת סיום — רק סגירה ידנית תסיר
         const [eh, em] = session.expectedEndTime.split(':').map(Number);
         const endDt = new Date(); endDt.setHours(eh, em, 0, 0);
         return Date.now() > endDt.getTime();
     })();
+
+    // כרטיס ירוק (רשום): מוצג כל עוד המפגש פתוח/מתוזמן-שהגיע-זמנו ושעת הסיום לא עברה
+    if ((session.status === 'open' || isScheduledNowOpen) && myAtt && !_sessionExpired) {
+        // ── Already registered — show green "מפגש פעיל" card ──────────
+        const regCard = document.createElement('div');
+        regCard.className = 'student-session-alert ssa-registered';
+        regCard.dataset.sid = sd.id;
+        regCard.dataset.registered = '1';
+        regCard.dataset.excState = 'none';
+
+        const isLateAtt   = myAtt.status === 'late';
+        const lateMinAtt  = myAtt.minutes || 0;
+        const regTimeStr  = myAtt.timestamp
+            ? (myAtt.timestamp.toDate ? myAtt.timestamp.toDate() : new Date(myAtt.timestamp)).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })
+            : '';
+        const excAtt = session.exceptions?.[auth.currentUser.uid];
+        const excStatus = excAtt?.resolvedStatus;
+
+        // Header
+        const regHeader = document.createElement('div');
+        regHeader.className = 'ssa-header ssa-header-green';
+        regHeader.innerHTML = `
+            <div class="ssa-header-icon">✅</div>
+            <div class="ssa-header-text">
+                <div class="ssa-header-label">מפגש פעיל</div>
+                <div class="ssa-header-title">${gd.data().name}</div>
+            </div>`;
+        regCard.appendChild(regHeader);
+
+        // Body
+        const regBody = document.createElement('div');
+        regBody.className = 'ssa-body';
+
+        // Meta chips
+        const regMeta = document.createElement('div');
+        regMeta.className = 'ssa-meta-row';
+        if (session.sessionNumber) { const c = document.createElement('span'); c.className = 'ssa-meta-chip'; c.textContent = `מפגש ${session.sessionNumber}`; regMeta.appendChild(c); }
+        if (session.expectedStartTime) { const c = document.createElement('span'); c.className = 'ssa-meta-chip'; c.innerHTML = `⏰ ${session.expectedStartTime}${session.expectedEndTime ? '–' + session.expectedEndTime : ''}`; regMeta.appendChild(c); }
+        if (session.locationName) { const c = document.createElement('span'); c.className = 'ssa-meta-chip'; c.textContent = `📌 ${session.locationName}`; regMeta.appendChild(c); }
+        regBody.appendChild(regMeta);
+
+        // Countdown pill replaced with registered text
+        const regPill = document.createElement('div');
+        regPill.className = 'ssa-countdown';
+        regPill.style.cssText = 'background:rgba(5,150,105,0.1);border-color:rgba(5,150,105,0.3);color:#059669;';
+        if (excAtt && excAtt.type === 'manual_request') {
+            if (excStatus === 'approved') regPill.textContent = '✅ בקשתך אושרה';
+            else if (excStatus === 'denied') regPill.textContent = '❌ בקשתך נדחתה';
+            else regPill.textContent = '⏳ בקשה חריגה בטיפול';
+        } else {
+            regPill.textContent = isLateAtt ? `⏱ נרשמת כמאחר · ${lateMinAtt} דק׳` : '✓ נרשמת';
+        }
+        regBody.appendChild(regPill);
+
+        // Registration details strip
+        const regStrip = document.createElement('div');
+        regStrip.className = 'ssa-registered-strip';
+        regStrip.innerHTML = `<span>✅ נוכחות נרשמה בהצלחה</span>`;
+        regBody.appendChild(regStrip);
+
+        // Detail chips
+        const chipRow = document.createElement('div');
+        chipRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin:6px 18px 4px;';
+        if (regTimeStr) { const c = document.createElement('span'); c.className = 'ssa-reg-detail-chip'; c.textContent = `🕐 ${regTimeStr}`; chipRow.appendChild(c); }
+        if (isLateAtt) {
+            const c = document.createElement('span'); c.className = 'ssa-reg-detail-chip late'; c.textContent = `⏱ איחור ${lateMinAtt} דק׳`; chipRow.appendChild(c);
+        } else if (!excAtt) {
+            const c = document.createElement('span'); c.className = 'ssa-reg-detail-chip'; c.textContent = '⚡ בזמן'; chipRow.appendChild(c);
+        }
+        if (excAtt) {
+            if (excStatus === 'approved') { const c = document.createElement('span'); c.className = 'ssa-reg-detail-chip'; c.style.cssText = 'color:var(--green);'; c.textContent = '✅ בקשה אושרה'; chipRow.appendChild(c); }
+            else if (excStatus === 'denied') { const c = document.createElement('span'); c.className = 'ssa-reg-detail-chip late'; c.textContent = '❌ בקשה נדחתה'; chipRow.appendChild(c); }
+            else { const c = document.createElement('span'); c.className = 'ssa-reg-detail-chip'; c.style.cssText = 'color:var(--amber);'; c.textContent = '⏳ ממתין לאישור'; chipRow.appendChild(c); }
+        }
+        regBody.appendChild(chipRow);
+
+        const tapHint = document.createElement('div');
+        tapHint.style.cssText = 'font-size:0.72rem;color:var(--muted);margin:0 18px 12px;display:flex;align-items:center;gap:4px;';
+        tapHint.textContent = '⬆ לחץ לפרטי הרישום';
+        regBody.appendChild(tapHint);
+
+        regCard.appendChild(regBody);
+
+        // Click → open status view
+        regCard.addEventListener('click', () => {
+            const sessionWithMeta = { ...session, _gname: session._gname || gd.data().name };
+            openSessionStatusView(sessionWithMeta, auth.currentUser.uid);
+        });
+
+        (_openSessionsFrag || openSessionsCont || alerts).appendChild(regCard);
+        // Track for tab bud — first registered open session wins
+        if (!_registeredOpenSession) _registeredOpenSession = session;
+    }
+
     if ((session.status === "open" || isScheduledNowOpen) && !myAtt && !_sessionExpired) {
         // For scheduled-now-open: resolve location from pre-sampled or last closed session in group
         if (isScheduledNowOpen && !session.instructorLocation?.lat) {
@@ -11179,6 +11935,12 @@ document.addEventListener('click', () => {
         // Keep ticking as long as pill is in the DOM
         if (effectiveStartForGrace && graceMins > 0) {
             _countdownTimer = setInterval(_updateCountdown, 1000);
+            // Expose a stop handle on the element so _convertCardToRegistered can
+            // cancel the timer when the student registers (pill stays in DOM but text changes)
+            countdownPill._countdownStop = () => {
+                clearInterval(_countdownTimer);
+                _countdownTimer = null;
+            };
             const observer = new MutationObserver(() => {
                 if (!document.contains(countdownPill)) { clearInterval(_countdownTimer); observer.disconnect(); }
             });
@@ -11309,6 +12071,11 @@ document.addEventListener('click', () => {
                 }
             }
 
+            // If student is already registered for an open session, show green ✓ tab bud
+            if (_registeredOpenSession) {
+                startTabBudWatcher(_registeredOpenSession, true);
+            }
+
             // ── NEXT SESSION BANNER ─────────────────────────────────────
             (function renderNextSessionBanner() {
                 const bannerEl = document.getElementById('student-next-session-banner');
@@ -11354,10 +12121,11 @@ document.addEventListener('click', () => {
                         daysLabel = 'היום!';
                     }
                 } else if (dayDiff === 1) {
-                    // 24h before session start → show hours
+                    // 24h before session start → show hours/minutes
                     if (msUntil > 0 && msUntil <= 24 * 3600000) {
                         const hrs = Math.floor(msUntil / 3600000);
-                        daysLabel = `בעוד ${hrs} שעות`;
+                        const mins = Math.floor((msUntil % 3600000) / 60000);
+                        daysLabel = hrs > 0 ? `בעוד ${hrs} שעות` : (mins > 0 ? `בעוד ${mins} דקות` : 'עוד מעט!');
                     } else {
                         daysLabel = 'מחר';
                     }
@@ -11675,17 +12443,28 @@ document.addEventListener('click', () => {
         async function openStudentGroup(gid, name, openTab) {
             state._curStudentGroupId = gid;
             state._curStudentGroupName = name;
+            // Safety: ensure body scroll lock is released when entering group details.
+            // If a modal was closed just before this call (e.g. practice-group-picker),
+            // the MutationObserver may not have fired yet — force-clear the lock here.
+            if (document.body.style.position === 'fixed') {
+                const savedY = parseInt(document.body.style.top || '0', 10) * -1;
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, savedY);
+            }
             state._quizCurrentAttemptId = null; // reset attempt on group change
             _navPush({ type: 'studentGroup', gid, name, openTab });
             // Reset leaders tab state on group change
             const leadContent = document.getElementById('student-leaders-content');
             if (leadContent) { leadContent._initialized = false; leadContent._period = 'week'; leadContent.innerHTML = ''; }
-            document.getElementById('student-main-dashboard').classList.add('hidden');
+            const _smdNav = document.getElementById('student-main-dashboard');
             const _sgd = document.getElementById('student-group-details');
+            _animateExit(_smdNav, 'view-exiting-forward', () => _smdNav.classList.add('hidden'));
             _sgd.classList.remove('hidden');
             _animateEnter(_sgd, 'view-entering-forward');
             safeText(document.getElementById('student-group-name-header'), name);
-            // Reset tabs, then optionally activate the requested one
             document.querySelectorAll('[data-student-group-tab]').forEach(t => t.classList.remove('active'));
             const startTab = openTab === 'practice' ? 'practice' : (openTab === 'leaders' ? 'leaders' : 'history');
             const activeTabEl = document.querySelector(`[data-student-group-tab="${startTab}"]`);
@@ -11868,7 +12647,8 @@ document.addEventListener('click', () => {
                     if (sessionData.scheduledDate !== todayStr) return false;
                     const [sh, sm] = sessionData.expectedStartTime.split(':').map(Number);
                     const startDt = new Date(); startDt.setHours(sh, sm, 0, 0);
-                    if (Date.now() < startDt.getTime() - 5 * 60000) return false; // not yet open
+                    const earlyMins = sessionData.openMinutesBefore != null ? sessionData.openMinutesBefore : 5;
+                    if (Date.now() < startDt.getTime() - earlyMins * 60000) return false; // not yet open
                     // If an end time is set, block registration once it has passed
                     if (sessionData.expectedEndTime) {
                         const [eh, em] = sessionData.expectedEndTime.split(':').map(Number);
@@ -11941,8 +12721,7 @@ document.addEventListener('click', () => {
                     // Code correct — reset counter
                     acState[acKey] = { count: 0, blockedUntil: 0 };
                     // Code OK — re-disable button and show loader for processing
-                    btnEl.disabled = true;
-                    btnEl.textContent = 'מעבד...';
+                    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'מעבד...'; }
                     _hideAttendLoader(); // close old loader if still open
                     // Re-show loader; store hide fn so the outer resetBtn (via _extraHide) cleans it up
                     const _extraHide = showOverlayLoader('מדווח נוכחות...');
@@ -11986,7 +12765,7 @@ document.addEventListener('click', () => {
                         // Re-show loader before continuing with GPS / save
                         const _lateHide = showOverlayLoader('מגיש דיווח נוכחות...');
                         _extraHiders.push(_lateHide);
-                        btnEl.disabled = true;
+                        if (btnEl) { btnEl.disabled = true; }
                     }
                     // On retry: cached answer reused silently — no extra Firestore read, no re-prompt
                 }
@@ -12029,17 +12808,21 @@ document.addEventListener('click', () => {
                     // Clear retry cache now that the save succeeded
                     delete _attendRetryCache[_retryKey];
                     resetBtn();
-                    // Remove the attend card immediately so the student sees
-                    // the session is no longer awaiting registration — no full reload needed.
-                    const _attendCard = document.querySelector('[data-sid="' + sid + '"]');
-                    if (_attendCard) _attendCard.remove();
-                    // Remove the attend card so it's gone immediately — no full reload needed.
-                    // Stats & history will update on next natural full load (tab focus / 2min throttle).
-                    const _savedCard = document.querySelector('[data-sid="' + sid + '"]');
-                    if (_savedCard) _savedCard.remove();
-                    if (state._curStudentGroupId && !document.getElementById('student-group-details').classList.contains('hidden')) {
-                        openStudentGroup(state._curStudentGroupId, state._curStudentGroupName);
-                    }
+                    // Convert the attend card to a green "מפגש פעיל" registered card
+                    // instead of removing it — student sees confirmation inline.
+                    const _sessionInfoForCard = {
+                        sessionNumber:     sessionData.sessionNumber,
+                        expectedStartTime: sessionData.expectedStartTime,
+                        expectedEndTime:   sessionData.expectedEndTime,
+                        locationName:      sessionData.locationName,
+                        scheduledDate:     sessionData.scheduledDate || new Date().toLocaleDateString('en-CA'),
+                        _gname:            document.querySelector('[data-sid="' + sid + '"] .ssa-header-title')?.textContent || '',
+                        sessionId:         sid,
+                        gid:               gid,
+                    };
+                    _convertCardToRegistered(sid, _sessionInfoForCard, { status: stat, minutes: lateMinutes, timestamp: new Date() });
+                    // Note: do NOT call openStudentGroup here — it would trigger a full group reload
+                    // that wipes the green registered card we just rendered.
                 };
 
                 // 5. No-GPS mode
@@ -12063,62 +12846,90 @@ document.addEventListener('click', () => {
                 try {
                     pos = await getLocation(bypassActive ? 3000 : 10000);
                 } catch (geoErr) {
-                    if (geoErr.code === 1) { // PERMISSION_DENIED
-                        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                        const hint = isIOS
-                            ? '\nלאיפוס: הגדרות ← פרטיות ← שירותי מיקום ← Safari ← "בעת השימוש"'
-                            : '\nלאיפוס: לחץ על 🔒 בשורת הכתובת ← הגדרות האתר ← מיקום ← אפשר';
-                        showToast('גישה למיקום נדחתה — אפשר מיקום בהגדרות' + hint, 'error');
-                        resetBtn();
+                    resetBtn();
+
+                    const _lrmCtx = { gid, sid, iLat, iLng, start, roundStartedAt };
+
+                    if (geoErr.code === 1) {
+                        // PERMISSION_DENIED — can't retry automatically; must fix in device settings
+                        _showLocationError('permission', retryCount, _lrmCtx);
+                        // Hide retry button (user must change device settings first)
+                        const retryBtn = document.getElementById('btn-retry-location');
+                        if (retryBtn) {
+                            retryBtn.style.display = 'none';
+                            retryBtn.onclick = null;
+                        }
+                        _showExceptionBtn(retryCount > 0);
+                        const btnExcPerm = document.getElementById('btn-send-exception');
+                        if (btnExcPerm) btnExcPerm.onclick = retryCount > 0
+                            ? () => sendExceptionRequest(gid, sid, null)
+                            : null;
                         return;
                     }
+
                     if (bypassActive) { await saveAttendance('GPS לא זמין'); return; }
-                    // code=2 (POSITION_UNAVAILABLE) or code=3 (TIMEOUT) — show retry modal
-                    resetBtn();
-                    // Exception button visible only after at least one failed attempt
-                    const _showExc = retryCount > 0;
-                    _showExceptionBtn(_showExc);
-                    // Always wire onclick so it's ready the moment the button becomes visible
+
+                    // code=2 POSITION_UNAVAILABLE or code=3 TIMEOUT
+                    const errType = geoErr.code === 3 ? 'timeout' : 'unavailable';
+                    _showLocationError(errType, retryCount, _lrmCtx);
+
+                    _showExceptionBtn(retryCount > 0);
                     const btnExcGps = document.getElementById('btn-send-exception');
-                    if (btnExcGps) btnExcGps.onclick = _showExc
-                        ? () => sendExceptionRequest(gid, sid, 'GPS לא זמין')
+                    if (btnExcGps) btnExcGps.onclick = retryCount > 0
+                        ? () => sendExceptionRequest(gid, sid, null)
                         : null;
-                    document.getElementById('btn-retry-location').onclick = (e) => {
-                        closeModals();
-                        // Pass null for btnEl on retry — the original button may be stale.
-                        // The overlay loader is the only visual feedback needed.
-                        startAttendProcess(gid, sid, iLat, iLng, start, retryCount + 1, e, null, roundStartedAt);
-                    };
-                    const _lrmEl = document.getElementById('location-retry-modal');
-                    if (_lrmEl) { _lrmEl.classList.remove('hidden'); requestAnimationFrame(() => _lrmEl.classList.add('lrm-open')); }
+                    const retryBtnGps = document.getElementById('btn-retry-location');
+                    if (retryBtnGps) {
+                        retryBtnGps.style.display = '';
+                        retryBtnGps.onclick = (e) => {
+                            closeModals();
+                            startAttendProcess(gid, sid, iLat, iLng, start, retryCount + 1, e, null, roundStartedAt);
+                        };
+                    }
                     return;
                 }
 
                 // 7. Check distance
-                _updateLoaderLabel('בודק מרחק ממיקום המפגש...');
+                _updateLoaderLabel('בודק נוכחות...');
                 const dist = haversineDistance(iLat, iLng, pos.coords.latitude, pos.coords.longitude);
-                if (dist === null) { showToast('שגיאת חישוב מרחק', 'error'); resetBtn(); return; }
+                if (dist === null) {
+                    // Coordinates invalid — treat as a calc error with full modal, not a silent toast
+                    resetBtn();
+                    _showLocationError('calc_error', retryCount, { gid, sid, iLat, iLng, start, roundStartedAt });
+                    _showExceptionBtn(retryCount > 0);
+                    const btnExcCalc = document.getElementById('btn-send-exception');
+                    if (btnExcCalc) btnExcCalc.onclick = retryCount > 0
+                        ? () => sendExceptionRequest(gid, sid, null)
+                        : null;
+                    const retryBtnCalc = document.getElementById('btn-retry-location');
+                    if (retryBtnCalc) {
+                        retryBtnCalc.style.display = '';
+                        retryBtnCalc.onclick = (e) => {
+                            closeModals();
+                            startAttendProcess(gid, sid, iLat, iLng, start, retryCount + 1, e, null, roundStartedAt);
+                        };
+                    }
+                    return;
+                }
 
                 const allowedRadius = (sessionData.attendanceRadius > 0) ? sessionData.attendanceRadius : 50;
 
                 if (dist <= allowedRadius || bypassActive) {
                     await saveAttendance(String(Math.round(dist)) + 'מ\'');
                 } else {
-                    // Too far — show retry modal
+                    // Too far — show location error modal with instructions
                     resetBtn();
-                    // Exception button visible only after at least one failed attempt
-                    const _showExcDist = retryCount > 0;
-                    _showExceptionBtn(_showExcDist);
+                    _showLocationError('distance', retryCount, { gid, sid, iLat, iLng, start, roundStartedAt });
+                    _showExceptionBtn(retryCount > 0);
                     const btnExcDist = document.getElementById('btn-send-exception');
-                    if (btnExcDist) btnExcDist.onclick = _showExcDist
+                    if (btnExcDist) btnExcDist.onclick = retryCount > 0
                         ? () => sendExceptionRequest(gid, sid, Math.round(dist))
                         : null;
-                    document.getElementById('btn-retry-location').onclick = (e) => {
+                    const retryBtnDist = document.getElementById('btn-retry-location');
+                    if (retryBtnDist) retryBtnDist.onclick = (e) => {
                         closeModals();
                         startAttendProcess(gid, sid, iLat, iLng, start, retryCount + 1, e, null, roundStartedAt);
                     };
-                    const _lrmEl2 = document.getElementById('location-retry-modal');
-                    if (_lrmEl2) { _lrmEl2.classList.remove('hidden'); requestAnimationFrame(() => _lrmEl2.classList.add('lrm-open')); }
                 }
 
             } catch (err) {
@@ -12212,7 +13023,7 @@ document.addEventListener('click', () => {
             if (exc.distance != null && exc.distance !== '') {
                 const distRow = document.createElement('p');
                 distRow.style.cssText = 'font-size:0.9rem;margin-bottom:0;';
-                distRow.innerHTML = `מרחק שנמדד: <strong style="color:var(--danger);">${safeHTML(String(exc.distance))} מטרים</strong>`;
+                distRow.innerHTML = `מרחק שנמדד: <strong style="color:var(--danger);">${safeHTML(String(exc.distance))}</strong>`;
                 eamText.appendChild(distRow);
             }
             const EXC_LABELS = { inclass: '🏫 אני בכיתה / במקום המפגש', other: '📝 אחר' };
@@ -12303,9 +13114,26 @@ document.addEventListener('click', () => {
                 if (exc?.resolvedStatus === 'approved') {
                     const attEntry = data.attendance?.[uid];
                     showExcResultModal(true, attEntry?.minutes || 0);
-                    // Remove card in-place — no full reload needed
-                    const _appCard = document.querySelector('[data-sid="' + sid + '"]');
-                    if (_appCard) _appCard.remove();
+                    // Convert card to registered (green) state instead of removing
+                    const _approvedStat   = attEntry?.status   || 'on_time';
+                    const _approvedMins   = attEntry?.minutes  || 0;
+                    const _approvedCardEl = document.querySelector('[data-sid="' + sid + '"]');
+                    if (_approvedCardEl) {
+                        const _approvedInfo = {
+                            sessionNumber:     data.sessionNumber,
+                            expectedStartTime: data.expectedStartTime,
+                            expectedEndTime:   data.expectedEndTime,
+                            locationName:      data.locationName,
+                            scheduledDate:     data.scheduledDate || new Date().toLocaleDateString('en-CA'),
+                            _gname:            _approvedCardEl.querySelector('.ssa-header-title')?.textContent || '',
+                            sessionId:         sid,
+                            gid:               gid,
+                        };
+                        _convertCardToRegistered(sid, _approvedInfo, { status: _approvedStat, minutes: _approvedMins, timestamp: attEntry?.timestamp || new Date() });
+                    } else {
+                        // Card already gone (e.g. tab switched) — rebuild from cache
+                        if (_studentDataCache) _refreshAttendCards(_studentDataCache);
+                    }
                     return;
                 }
                 if (exc?.resolvedStatus === 'denied') {
@@ -12314,9 +13142,10 @@ document.addEventListener('click', () => {
                     const _lateKeyDenied = gid + '_' + sid;
                     delete _attendRetryCache[_lateKeyDenied];
                     showExcResultModal(false, 0);
-                    // Remove the pending card — student will need to re-tap "דווח נוכחות"
+                    // Remove the pending card then rebuild so student can re-tap "דווח נוכחות"
                     const _deniedCard = document.querySelector('[data-sid="' + sid + '"]');
                     if (_deniedCard) _deniedCard.remove();
+                    if (_studentDataCache) _refreshAttendCards(_studentDataCache);
                     return;
                 }
                 // Case B: exception deleted entirely — could be:
@@ -12325,10 +13154,24 @@ document.addEventListener('click', () => {
                 if (!exc) {
                     const attEntry = data.attendance?.[uid];
                     if (attEntry) {
-                        // Approved — show success, remove card
+                        // Approved — convert card to registered (green) state
                         showExcResultModal(true, attEntry.minutes || 0);
-                        const _approvedCard = document.querySelector('[data-sid="' + sid + '"]');
-                        if (_approvedCard) _approvedCard.remove();
+                        const _caseB_Card = document.querySelector('[data-sid="' + sid + '"]');
+                        if (_caseB_Card) {
+                            const _caseBInfo = {
+                                sessionNumber:     data.sessionNumber,
+                                expectedStartTime: data.expectedStartTime,
+                                expectedEndTime:   data.expectedEndTime,
+                                locationName:      data.locationName,
+                                scheduledDate:     data.scheduledDate || new Date().toLocaleDateString('en-CA'),
+                                _gname:            _caseB_Card.querySelector('.ssa-header-title')?.textContent || '',
+                                sessionId:         sid,
+                                gid:               gid,
+                            };
+                            _convertCardToRegistered(sid, _caseBInfo, { status: attEntry.status || 'on_time', minutes: attEntry.minutes || 0, timestamp: attEntry.timestamp || new Date() });
+                        } else if (_studentDataCache) {
+                            _refreshAttendCards(_studentDataCache);
+                        }
                     } else {
                         // Denied (exception deleted, no attendance) — clear cache, let student retry
                         const _lateKeyDel = gid + '_' + sid;
@@ -12348,6 +13191,164 @@ document.addEventListener('click', () => {
         // Smoothly reveal / hide the "send exception" button in the retry modal.
         // Uses max-height + opacity transition instead of class="hidden" so there's
         // no jarring pop-in on the first retry.
+        // ── LOCATION ERROR MODAL — dynamic content per error type + device ──
+        // type: 'permission' | 'unavailable' | 'timeout' | 'distance'
+        // retryCount: number of previous attempts (0 = first failure)
+        function _showLocationError(type, retryCount, { gid, sid, iLat, iLng, start, roundStartedAt } = {}) {
+            const isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isAndroid = /Android/.test(navigator.userAgent);
+
+            const iconEl  = document.getElementById('lrm-icon');
+            const titleEl = document.getElementById('lrm-title');
+            const subEl   = document.getElementById('lrm-sub');
+            const tipsEl  = document.getElementById('lrm-tips');
+            const headerEl = document.getElementById('lrm-header');
+
+            if (!iconEl || !titleEl || !subEl || !tipsEl) return;
+
+            // ── Content by error type ───────────────────────────────────
+            const tip = (icon, text) =>
+                `<div class="lrm-tip-row"><span class="lrm-tip-icon">${icon}</span><span>${text}</span></div>`;
+
+            let icon, title, sub, tips, headerColor;
+
+            if (type === 'permission') {
+                icon  = '🔒';
+                title = 'גישה למיקום נחסמה';
+                headerColor = '#b91c1c';
+
+                if (isIOS) {
+                    sub  = 'האפליקציה לא קיבלה הרשאת מיקום. יש לאפשר ב-הגדרות iPhone.';
+                    tips = `
+                        <div class="lrm-tips-title">📱 כיצד לאפשר מיקום ב-iPhone</div>
+                        ${tip('1️⃣', 'פתח <strong>הגדרות</strong> (Settings) ← <strong>פרטיות ואבטחה</strong>')}
+                        ${tip('2️⃣', 'לחץ <strong>שירותי מיקום</strong> (Location Services) ← ודא שזה <strong>פועל</strong>')}
+                        ${tip('3️⃣', 'גלול לתחתית ← מצא <strong>Safari</strong> (או הדפדפן שלך) ← בחר <strong>"בעת השימוש"</strong>')}
+                        ${tip('4️⃣', 'חזור לאפליקציה ולחץ <strong>נסה שוב</strong>')}
+                        ${tip('⚠️', 'אם כבר אפשרת — סגור את הדפדפן לחלוטין, פתח מחדש ונסה שוב')}`;
+                } else if (isAndroid) {
+                    sub  = 'האפליקציה לא קיבלה הרשאת מיקום. יש לאפשר ב-הגדרות האנדרואיד.';
+                    tips = `
+                        <div class="lrm-tips-title">📱 כיצד לאפשר מיקום ב-Android</div>
+                        ${tip('1️⃣', 'לחץ לחיצה ארוכה על <strong>סמל הנעילה 🔒</strong> בשורת הכתובת')}
+                        ${tip('2️⃣', 'בחר <strong>הרשאות</strong> או <strong>הגדרות אתר</strong>')}
+                        ${tip('3️⃣', 'לחץ על <strong>מיקום</strong> ← שנה ל-<strong>אפשר</strong>')}
+                        ${tip('4️⃣', 'רענן את הדף וחזור לדיווח נוכחות')}
+                        ${tip('⚠️', 'אם Chrome חסם — פתח: הגדרות Chrome ← הגדרות אתר ← מיקום ← הסר את החסימה')}`;
+                } else {
+                    sub  = 'האפליקציה לא קיבלה הרשאת מיקום. יש לאפשר בדפדפן.';
+                    tips = `
+                        <div class="lrm-tips-title">🖥️ כיצד לאפשר מיקום בדפדפן</div>
+                        ${tip('1️⃣', 'לחץ על <strong>סמל הנעילה 🔒</strong> לצד שורת הכתובת')}
+                        ${tip('2️⃣', 'בחר <strong>הגדרות אתר</strong> ← <strong>מיקום</strong> ← <strong>אפשר</strong>')}
+                        ${tip('3️⃣', 'רענן את הדף וחזור לדיווח נוכחות')}`;
+                }
+
+            } else if (type === 'unavailable') {
+                icon  = '📡';
+                title = 'לא ניתן לאתר מיקום GPS';
+                headerColor = '#b45309';
+
+                if (isIOS) {
+                    sub  = 'ה-iPhone לא הצליח לקבל אות GPS. בדרך כלל קורה בפנים — נסה בחוץ לכמה שניות.';
+                    tips = `
+                        <div class="lrm-tips-title">💡 פתרונות נפוצים ב-iPhone</div>
+                        ${tip('📶', 'ודא שאתה בעל אות סלולר / Wi-Fi — מאיץ את השגת המיקום')}
+                        ${tip('🔋', 'כבה <strong>מצב חיסכון בסוללה</strong>: הגדרות ← סוללה ← כבה Low Power Mode')}
+                        ${tip('🔄', 'הפעל/כבה מצב טיסה פעם אחת — מאתחל את ה-GPS')}
+                        ${tip('🌐', 'הפעל <strong>שירותי מיקום מדויקים</strong>: הגדרות ← פרטיות ← שירותי מיקום ← Safari ← הפעל "מיקום מדויק"')}
+                        ${tip('🏃', 'צא מהבניין לכמה שניות ולחץ "נסה שוב"')}`;
+                } else if (isAndroid) {
+                    sub  = 'האנדרואיד לא הצליח לקבל אות GPS. בדרך כלל קורה בפנים.';
+                    tips = `
+                        <div class="lrm-tips-title">💡 פתרונות נפוצים ב-Android</div>
+                        ${tip('📍', 'פתח הגדרות ← <strong>מיקום</strong> ← ודא שמופעל ← <strong>דיוק מיקום Google</strong> מופעל')}
+                        ${tip('🔋', 'כבה <strong>חיסכון בסוללה</strong> / Doze Mode — עלול לחסום GPS')}
+                        ${tip('🔄', 'הפעל/כבה את ה-Wi-Fi — מסייע לשגת מיקום מהיר')}
+                        ${tip('🌐', 'ב-Chrome: הגדרות ← הגדרות אתר ← מיקום ← ודא שהאתר מורשה')}
+                        ${tip('🏃', 'צא מהבניין לכמה שניות ולחץ "נסה שוב"')}`;
+                } else {
+                    sub  = 'הדפדפן לא הצליח לקבל מיקום GPS. נסה בחוץ.';
+                    tips = `
+                        <div class="lrm-tips-title">💡 מה לנסות</div>
+                        ${tip('🔄', 'הפעל/כבה את ה-Wi-Fi ואת ה-GPS ולחץ "נסה שוב"')}
+                        ${tip('🏃', 'צא מהבניין לכמה שניות')}
+                        ${tip('🔋', 'כבה מצב חיסכון בסוללה')}`;
+                }
+
+            } else if (type === 'timeout') {
+                icon  = '⏱️';
+                title = 'GPS לקח יותר מדי זמן';
+                headerColor = '#b45309';
+
+                if (isIOS) {
+                    sub  = 'ה-iPhone לא השיב בזמן. לרוב קורה כשנמצאים בפנים.';
+                    tips = `
+                        <div class="lrm-tips-title">💡 מה לנסות ב-iPhone</div>
+                        ${tip('🏃', '<strong>צא מהבניין</strong> — GPS עובד טוב יותר בחוץ')}
+                        ${tip('🌐', 'ודא שמחובר ל-Wi-Fi או לרשת סלולר — מאיץ שגת מיקום')}
+                        ${tip('🔋', 'כבה Low Power Mode: הגדרות ← סוללה')}
+                        ${tip('🔄', 'סגור את Safari לחלוטין ← פתח מחדש ← חזור לאפליקציה')}`;
+                } else if (isAndroid) {
+                    sub  = 'Android לא השיב בזמן. נסה בחוץ או אפשר דיוק מיקום גבוה.';
+                    tips = `
+                        <div class="lrm-tips-title">💡 מה לנסות ב-Android</div>
+                        ${tip('🏃', '<strong>צא מהבניין</strong> — GPS עובד טוב יותר בחוץ')}
+                        ${tip('📍', 'פתח הגדרות ← מיקום ← שנה ל-<strong>דיוק גבוה</strong> (High Accuracy)')}
+                        ${tip('🔋', 'כבה חיסכון בסוללה ← Battery Saver / Doze')}
+                        ${tip('🔄', 'כבה ד-Wi-Fi והדלק מחדש — עוזר לאנדרואיד לשגת מיקום')}`;
+                } else {
+                    sub  = 'הדפדפן לא השיב בזמן.';
+                    tips = `
+                        <div class="lrm-tips-title">💡 מה לנסות</div>
+                        ${tip('🏃', 'צא מהבניין לכמה שניות ולחץ "נסה שוב"')}
+                        ${tip('🔄', 'כבה Wi-Fi, חכה 5 שניות, הדלק מחדש')}`;
+                }
+
+            } else if (type === 'calc_error') {
+                icon  = '⚠️';
+                title = 'שגיאה בבדיקת הנוכחות';
+                headerColor = '#b91c1c';
+                sub   = 'אירעה שגיאה זמנית בעת בדיקת הנוכחות. לא נגרם כל נזק — אפשר לנסות שוב.';
+                tips  = `
+                    <div class="lrm-tips-title">💡 מה לנסות</div>
+                    ${tip('🔄', 'לחץ "נסה שוב" — הבעיה בדרך כלל חולפת מיד')}
+                    ${tip('📶', 'ודא שיש חיבור לאינטרנט (Wi-Fi או סלולר)')}
+                    ${tip('🔋', 'כבה מצב חיסכון בסוללה — עלול להגביל שירותי מיקום')}
+                    ${tip('✋', retryCount > 0 ? 'אם הבעיה חוזרת — שלח בקשה חריגה למדריך' : 'אם הבעיה חוזרת — לחץ "נסה שוב" פעם נוספת לקבלת אפשרות בקשה חריגה')}`;
+
+            } else { // 'distance'
+                icon  = '📍';
+                title = 'לא זוהית במקום המפגש';
+                headerColor = '#b91c1c';
+                sub   = 'המערכת לא הצליחה לאמת את נוכחותך במיקום המפגש. ודא שאתה נמצא בסביבת המפגש ונסה שוב.';
+                tips  = `
+                    <div class="lrm-tips-title">💡 מה לנסות</div>
+                    ${tip('🏃', 'ודא שאתה נמצא פיזית במקום המפגש')}
+                    ${tip('📶', 'GPS בפנים עלול להיות פחות מדויק — נסה ליד חלון או בחוץ לכמה שניות')}
+                    ${tip('🔄', 'המתן מספר שניות ולחץ "נסה שוב"')}
+                    ${isIOS  ? tip('🌐', 'iPhone: הגדרות ← פרטיות ← שירותי מיקום ← Safari ← הפעל "מיקום מדויק"') : ''}
+                    ${isAndroid ? tip('📍', 'Android: הגדרות ← מיקום ← שנה ל-דיוק גבוה') : ''}
+                    ${tip('✋', retryCount > 0 ? 'אם הבעיה חוזרת — שלח בקשה חריגה למדריך' : 'אם הבעיה חוזרת — לחץ "נסה שוב" פעם נוספת לקבלת אפשרות בקשה חריגה')}`;
+            }
+
+            // ── Populate modal ──────────────────────────────────────────
+            if (iconEl)   iconEl.textContent  = icon;
+            if (titleEl)  titleEl.textContent = title;
+            if (subEl)    subEl.textContent   = sub;
+            if (tipsEl)   tipsEl.innerHTML    = tips;
+            if (headerEl) headerEl.style.background = headerColor
+                ? `linear-gradient(135deg,${headerColor},${headerColor}dd)`
+                : '';
+
+            // ── Open modal ──────────────────────────────────────────────
+            const modal = document.getElementById('location-retry-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                requestAnimationFrame(() => modal.classList.add('lrm-open'));
+            }
+        }
+
         function _showExceptionBtn(show) {
             const btn = document.getElementById('btn-send-exception');
             if (!btn) return;
@@ -12489,7 +13490,7 @@ document.addEventListener('click', () => {
             });
         }
 
-        async function sendExceptionRequest(gid, sid, distCalculated) {
+        async function sendExceptionRequest(gid, sid, distMeters) {
             // First close the retry modal so the note modal renders cleanly
             const _lrmClose = document.getElementById('location-retry-modal'); if (_lrmClose) { _lrmClose.classList.remove('lrm-open'); _lrmClose.classList.add('hidden'); }
 
@@ -12511,11 +13512,15 @@ document.addEventListener('click', () => {
                     }
                 } catch(e) { /* no location — skip */ }
 
+                // distMeters is a number when GPS succeeded but student was out of range,
+                // or null when GPS was unavailable/denied/error (no measurable distance).
+                const distanceField = (distMeters != null) ? `${distMeters}מ'` : null;
+
                 await updateDoc(doc(db, "groups", gid, "sessions", sid), {
                     [`exceptions.${auth.currentUser.uid}`]: {
                         status: 'pending',
                         type: 'manual_request',
-                        distance: distCalculated,
+                        ...(distanceField != null ? { distance: distanceField } : {}),
                         timestamp: serverTimestamp(),
                         viewed: false,
                         ...(noteResult?.reason ? { excReason: noteResult.reason } : {}),
@@ -13180,10 +14185,16 @@ document.addEventListener('click', () => {
                     markBtn.textContent = 'סמן כנקרא';
                     markBtn.addEventListener('click', async () => {
                         markBtn.disabled = true;
-                        await updateDoc(doc(db, "userMessages", d.id), { readByRecipient: true });
-                        div.classList.remove('msg-unread');
-                        markBtn.remove();
-                        showToast('סומן כנקרא', 'success');
+                        try {
+                            await updateDoc(doc(db, "userMessages", d.id), { readByRecipient: true });
+                            div.classList.remove('msg-unread');
+                            markBtn.remove();
+                            showToast('סומן כנקרא', 'success');
+                        } catch(e) {
+                            console.error('mark-read error:', e);
+                            markBtn.disabled = false;
+                            showToast('שגיאה בעדכון — נסה שוב', 'error');
+                        }
                     });
                     btnRow.appendChild(markBtn);
                 }
@@ -13770,9 +14781,15 @@ setTimeout(() => {
                     btn.addEventListener('click', async () => {
                         const reqId = btn.dataset.reqId;
                         btn.disabled = true; btn.textContent = 'מעדכן...';
-                        await updateDoc(doc(db, "passwordResetRequests", reqId), { status: 'resolved', resolvedAt: serverTimestamp(), resolvedBy: auth.currentUser.uid });
-                        showToast('הבקשה סומנה כטופלה', 'success');
-                        loadPasswordRequests();
+                        try {
+                            await updateDoc(doc(db, "passwordResetRequests", reqId), { status: 'resolved', resolvedAt: serverTimestamp(), resolvedBy: auth.currentUser.uid });
+                            showToast('הבקשה סומנה כטופלה', 'success');
+                            loadPasswordRequests();
+                        } catch(e) {
+                            console.error('mark-resolved error:', e);
+                            btn.disabled = false; btn.textContent = 'סמן כטופל';
+                            showToast('שגיאה בעדכון — נסה שוב', 'error');
+                        }
                     });
                 });
             } catch(e) {
@@ -14256,9 +15273,14 @@ setTimeout(() => {
                     card.querySelector('[data-del]').addEventListener('click', async () => {
                         const ok = await appDialog({ title: 'מחיקת הצעה', message: 'למחוק את הצעת השאלה?', confirmText: 'מחק', cancelText: 'ביטול', danger: true });
                         if (!ok) return;
-                        await deleteDoc(doc(db, 'questionSuggestions', d.id));
-                        showToast('ההצעה נמחקה');
-                        loadInstructorQuizSuggestions();
+                        try {
+                            await deleteDoc(doc(db, 'questionSuggestions', d.id));
+                            showToast('ההצעה נמחקה');
+                            loadInstructorQuizSuggestions();
+                        } catch(e) {
+                            console.error('delete suggestion error:', e);
+                            showToast('שגיאה במחיקה — נסה שוב', 'error');
+                        }
                     });
                     list.appendChild(card);
                 });
@@ -14704,7 +15726,7 @@ setTimeout(() => {
         function openStudentQuizPractice(sessionNum, questions, myAnswers, allAnswerDocs) {
             const view = document.getElementById('student-quiz-view');
             const groupDetails = document.getElementById('student-group-details');
-            groupDetails.classList.add('hidden');
+            _animateExit(groupDetails, 'view-exiting-down', () => groupDetails.classList.add('hidden'));
             view.classList.remove('hidden');
             _animateEnter(view, 'view-entering-up');
             document.body.classList.add('quiz-active');
@@ -15900,8 +16922,10 @@ setTimeout(() => {
             state._isMasterSmartMode = false;
             const view = document.getElementById('student-quiz-view');
             view.classList.remove('smart-mode-active');
-            view.classList.add('hidden');
-            document.body.classList.remove('quiz-active');
+            _animateExit(view, 'view-exiting-down', () => {
+                view.classList.add('hidden');
+                document.body.classList.remove('quiz-active');
+            });
             const _sgdsm = document.getElementById('student-group-details');
             if (_sgdsm) { _sgdsm.classList.remove('hidden'); _animateEnter(_sgdsm, 'view-entering-back'); }
             state._quizCurrentAttemptId = null;
@@ -16491,9 +17515,12 @@ setTimeout(() => {
 
         // Wire student quiz back buttons
         function goBackToSessionsList() {
-            document.getElementById('student-quiz-view').classList.add('hidden');
-            document.body.classList.remove('quiz-active');
+            const _qv = document.getElementById('student-quiz-view');
             const _sgdq = document.getElementById('student-group-details');
+            _animateExit(_qv, 'view-exiting-down', () => {
+                _qv.classList.add('hidden');
+                document.body.classList.remove('quiz-active');
+            });
             if (_sgdq) { _sgdq.classList.remove('hidden'); _animateEnter(_sgdq, 'view-entering-back'); }
             state._quizCurrentAttemptId = null;
             document.querySelectorAll('[data-student-group-tab]').forEach(t => t.classList.remove('active'));
@@ -16600,9 +17627,14 @@ setTimeout(() => {
                     card.querySelector('[data-del]').addEventListener('click', async () => {
                         const ok = await appDialog({ title: 'מחיקת הצעה', message: 'למחוק את הצעת השאלה?', confirmText: 'מחק', cancelText: 'ביטול', danger: true });
                         if (!ok) return;
-                        await deleteDoc(doc(db, 'questionSuggestions', d.id));
-                        showToast('ההצעה נמחקה');
-                        openAdminSuggestionsModal();
+                        try {
+                            await deleteDoc(doc(db, 'questionSuggestions', d.id));
+                            showToast('ההצעה נמחקה');
+                            openAdminSuggestionsModal();
+                        } catch(e) {
+                            console.error('delete suggestion error:', e);
+                            showToast('שגיאה במחיקה — נסה שוב', 'error');
+                        }
                     });
                     listEl.appendChild(card);
                 });
