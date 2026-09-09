@@ -4,7 +4,7 @@
   "description": "אפליקציה לניהול ודיווח נוכחות מבוססת מיקום",
   "icons": [
     {
-      "src": "Micon.png",
+      "src": "micon.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
@@ -14,13 +14,19 @@
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
+    },
+    {
+      "src": "micon4.png",
+      "type": "image/png",
+      "sizes": "1024x1024",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f8fafc",
-  "theme_color": "#d32f2f",
+  "background_color": "#030f26",
+  "theme_color": "#030f26",
   "scope": "./",
   "lang": "he",
   "dir": "rtl"
