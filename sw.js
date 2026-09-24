@@ -1,4 +1,4 @@
-const VERSION = 'v1.1.1'; 
+const VERSION = 'v1.1.2';
 const CACHE_NAME = `im-here-${VERSION}`;
 
 const APP_SHELL = [
@@ -16,7 +16,6 @@ const NEVER_INTERCEPT_HOSTS = [
     'securetoken.googleapis.com',
     'www.googleapis.com',
 ];
-
 
 const FIREBASE_SDK_HOST = 'www.gstatic.com';
 
@@ -41,12 +40,12 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     const req = event.request;
-    if (req.method !== 'GET') return; 
+    if (req.method !== 'GET') return;
 
     const url = new URL(req.url);
-if (NEVER_INTERCEPT_HOSTS.includes(url.hostname)) return;
+    if (NEVER_INTERCEPT_HOSTS.includes(url.hostname)) return;
 
-        if (req.mode === 'navigate') {
+    if (req.mode === 'navigate') {
         event.respondWith(
             fetch(req)
                 .then((res) => {
@@ -70,7 +69,7 @@ if (NEVER_INTERCEPT_HOSTS.includes(url.hostname)) return;
         return;
     }
 
-        if (url.origin === self.location.origin) {
+    if (url.origin === self.location.origin) {
         event.respondWith(
             caches.match(req).then((cached) => {
                 const networkFetch = fetch(req).then((res) => {
@@ -83,9 +82,7 @@ if (NEVER_INTERCEPT_HOSTS.includes(url.hostname)) return;
         );
         return;
     }
-
 });
-
 
 self.addEventListener('push', (event) => {
     let payload = {};
@@ -108,12 +105,17 @@ self.addEventListener('push', (event) => {
         badge: './micon4.png',
         dir: 'rtl',
         lang: 'he',
+        // tag groups/replaces repeat notifications instead of stacking
+        // duplicates (e.g. if the same reminder is ever sent twice);
+        // renotify makes a replacement still alert the user rather than
+        // silently swapping the old one out unseen.
+        tag: data.tag || undefined,
+        renotify: !!data.tag,
         data: { url: targetUrl },
     };
 
     event.waitUntil(self.registration.showNotification(title, options));
 });
-
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
